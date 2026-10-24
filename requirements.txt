@@ -1,0 +1,15 @@
+gnani-vachana==0.8.2
+openai==3.37.0
+anthropic==2.3.0
+python-dotenv==1.2.4
+requests==2.34.2
+numpy==2.5.4
+sentence-transformers==6.2.0
+torch==2.14.1
+bm25s==0.3.15
+PyStemmer==3.1.0
+soundfile==0.14.0
+imageio-ffmpeg==0.6.0
+pytest==9.1.1
+gradio==6.30.0
+pandas==3.0.3

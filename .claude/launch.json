@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demo",
+      "runtimeExecutable": "C:\\Users\\shres\\.venvs\\voiceops\\Scripts\\python.exe",
+      "runtimeArgs": ["app.py"],
+      "env": { "PYTHONUTF8": "1" },
+      "port": 7860
+    }
+  ]
+}
