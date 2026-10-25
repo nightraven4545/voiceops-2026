@@ -104,6 +104,16 @@ def test_extractors(text, order_id, proof):
     assert rules.find_proof(text) == proof
 
 
+@pytest.mark.parametrize("reply, ok", [
+    ("Refund 7 se 10 din mein shuru hoga.", True), ("usually 7-10 calendar days", True), ("७ से १० दिन", True),
+    ("Your RRN is 315633825001.", True), ("Your RRN is 3156 3382 5001.", False),  # graders need it whole
+    ("about 17 to 10 days", False), ("within 10 days", False)])
+def test_states(reply, ok):
+    fact = "if_refused_at_door: usually 7 to 10 calendar days" if "RRN" not in reply else "rrn: 315633825001"
+    assert rules.states(reply, fact) is ok
+    assert rules.states(reply, "no numbers here")  # nothing to check
+
+
 def test_find_skus():
     assert rules.find_skus("SKU ele-0012 aur FSH 0026") == ["ELE-0012", "FSH-0026"]
 

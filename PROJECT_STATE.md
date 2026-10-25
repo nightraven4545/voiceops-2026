@@ -1,10 +1,10 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 13:20 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 13:50 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
-**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 93%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (45/45 tests). What's left is mostly finishing and submitting.
+**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 96%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (55/55 tests). What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
 - The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
@@ -28,10 +28,8 @@
    - retrieval metric
    - deadline time
 5. **Optional, only with spare time and quota:**
-   - a post-check that "must state" computed facts (refund timing, RRN) appear in the reply
-   - softer abstention on "what if I'm not home?"
-
-   Each change needs an eval rerun (full + conversations ≈ 300 calls), so don't start this on submission day.
+   - ~~a post-check that "must state" computed facts (refund timing, RRN) appear in the reply~~: done 25 Oct (see Checklist history)
+   - softer abstention on "what if I'm not home?" (PC011/PC012). This one changes prompts, so it needs a real eval rerun (full + conversations ≈ 300 calls); don't start it on submission day.
 6. **Submission:**
    - make the repo public: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences`
    - build `<team>_voiceops.zip` with `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf` (copied from `report/`), `demo.mp4`, `sample_outputs/`
@@ -45,7 +43,7 @@
 - the rejected superseded-section down-weighting
 - the gold-aligned decisions: unanswerable → `answer`; compensation → `refuse`
 
-**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free.
+**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free. Used on 25 Oct after the reset: about 30 (clean clone 24, PC021 3, post-check 3).
 
 ## Goal and deadline
 IIT-G C&A × Gnani.ai "VoiceOps 2026": a voice customer-support agent for the fictional store ZentroMart. Brief: `C:\Users\shres\OneDrive\Documents\capstone_AI_ML\6ad64c83eae85_voiceops_2026_capstone_brief.pdf`.
@@ -77,7 +75,7 @@ Submission:
 | Area | State |
 |---|---|
 | Agent (`src/`), batch runner (`run.py`), demo (`app.py`) | Built and working |
-| Rule + agent tests | 45 passing (`python -m pytest tests`) |
+| Rule + agent tests | 55 passing (`python -m pytest tests`) |
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
 | Voice end to end | 17/17 files processed, batch never stops. PC021 (Hindi, failed verification twice) verified live on 25 Oct: 4/4 turns pass the practice gold, replies in Devanagari, no private data in any Gemini prompt or reply. Reply WAVs now carry real header sizes |
 | Report | `report/report.md` → `report/report.pdf` (3 pages, A4). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
@@ -87,7 +85,7 @@ Submission:
 ## Results (practice set, `eval/results/<model>/`)
 | Model | Step 1 baseline | Step 2 RAG | Full agent | Full, `asr_text` | Conversations (turns) | Tool calls |
 |---|---|---|---|---|---|---|
-| `gemini-3.1-flash-lite` (**submission**) | 15% | 83% | **96%** | **96%** | **93%** (96/96 turns), decisions 100% | 100% exact |
+| `gemini-3.1-flash-lite` (**submission**) | 15% | 83% | **96%** | **96%** | **96%** (92/96 turns; dev 72/75, test 20/21), decisions 100% | 100% exact |
 | `gemini-3.5-flash-lite` (earlier) | 21% | 67%* | 92% | — | incomplete (quota) | 100% exact |
 
 \*3.5's Step 2 ran before the prompt fixes.
@@ -102,7 +100,6 @@ Retrieval Recall@5, using the cached 3.1 rewrites:
 
 Remaining failures:
 - **Conversations:**
-  - fact left unstated: PC019/PC020 refuse-at-door "7–10 days", PC010 RRN
   - over-cautious abstention: PC011/PC012 "what if I'm not home"
   - Hindi synonyms the strict scorer misses: PC009, PC016
 - **Single questions:** PQ0053 invented an answer; PQ0058 asked "which colour?" unnecessarily.
@@ -136,7 +133,15 @@ Remaining failures:
 - [x] PC021 by voice, live, 25 Oct 13:01 IST (3 fresh Gemini calls, rest cached): `clarify, clarify, clarify, refuse`, the gold tool calls, 4/4 turns pass the repo's own conversation scorer. Three independent read-only checks (gold scorer, privacy, voice) confirmed it. Added to `sample_outputs/` (inputs, replies, README row).
 - [x] **IDV-3 lock bypass fixed** (found by the privacy check): a new order ID used to reset `attempts`/`locked`, so alternating order IDs gave unlimited guesses at the last 4 digits. `State.failed` now counts failures per order for the whole conversation, and naming a locked order again gets `refuse`. A caller's other orders still verify. Test `test_switching_orders_keeps_the_lock`. The cached `conversations` and `full` evals replay byte-identical.
 - [x] **Reply WAV header fixed**: Gnani streams `0xFFFFFFFF` RIFF/data sizes, so Python's `wave` read every reply as ~24.8 h. `speak()` now rewrites the file once with soundfile (same samples, PCM 16). All 17 sample replies regenerated; reply texts unchanged.
-- [ ] Optional quality fix: a post-check that every "must state" computed fact (refund timing, RRN) appears in the reply.
+- [x] **Must-state post-check** (25 Oct). Code lists the facts a policy requires in this situation:
+  - the RRN when a verified customer's turn is about a refund (REF-6)
+  - `if_refused_at_door` when a shipped order's cancellation is refused (CAN-2; never on escalate, which must promise no time)
+
+  If the reply lacks a fact's numbers (`rules.states`, whole numbers as the graders match them), one rewrite is asked for. It's kept only if it states the fact, keeps every number of the first reply and passes `FORBIDDEN`; if the call fails, the first reply stands. It's skipped when the abstention gate will replace the reply anyway.
+  - **Cost:** a cache-only replay showed only PC010-t4, PC019-t4 and PC020-t4 (all dev) need a call; every other prompt is byte-identical. The live run used exactly 3 Gemini calls.
+  - **Result:** conversations 89 → 92/96 (dev 69 → 72/75, test 20/21 unchanged). The full and full-ASR question evals replay byte-identical.
+  - **Reviewed** before spending quota by 3 read-only reviewers (policy, code, voice). Fixes from the review: the guarded call, the keep-the-first-reply's-numbers rule, grader-exact number matching, skip-on-abstain, and a Devanagari "कैंसिल/रिफ़ंड … कर दिया" branch in `FORBIDDEN` (no cached reply matches it).
+  - **Known limits:** COD's "nothing is charged" has no digits, so it's never enforced. An unrelated 7 and 10 in the reply count as stated. Facts with dates or ₹ amounts would need normalisation before being added to `must`.
 - [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
 - [x] report.pdf (3 pages).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.

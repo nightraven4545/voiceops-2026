@@ -12,7 +12,8 @@ def fake_llm(compose):
     def llm_json(system, user, schema):
         if schema is agent.UNDERSTAND_SCHEMA:
             msg = user.split("LATEST MESSAGE:")[-1].lower()
-            return {"english_query": "damaged item replacement" if "damage" in msg else "order help",
+            return {"english_query": "damaged item replacement" if "damage" in msg else
+                    "where is my refund" if "refund" in msg else "order help",
                     "reply_lang": "hi-en", "intent": "damaged_item" if "damage" in msg else "order_help",
                     "products": ["Zentro Vista 43-inch 4K Smart TV"] if "tv" in msg else [], "payment_method": "none",
                     "refund_initiated_on": "", "delivered_on": "", "ordered_on": "",
@@ -72,6 +73,47 @@ def test_switching_orders_keeps_the_lock(scripted):  # IDV-3: naming another ord
     back = a.respond("Order number hai 7746 1439.")
     assert back["decision"] == "refuse" and "IDV-3" in back["sources"] and a.state.order is None
     assert a.respond("Last four digits 1263 hain.")["tool_calls"] == []  # no third guess, even the right one
+
+
+@pytest.mark.parametrize("order, proof, ask, needed", [
+    ("1664 0894", "2108", "Mera refund kahan hai?", "315633825001"),  # practice PC010: RRN (REF-6)
+    ("1591 1102", "440010", "Mujhe ise cancel karna hai.", "7")])     # practice PC019: refused at the door (CAN-2)
+def test_post_check_adds_a_left_out_fact(monkeypatch, order, proof, ask, needed):
+    composed = []
+
+    def llm_json(system, user, schema):
+        if schema is agent.UNDERSTAND_SCHEMA:
+            msg = user.split("LATEST MESSAGE:")[-1].lower()
+            return {"english_query": "where is my refund" if "refund" in msg else "order help", "reply_lang": "hi-en",
+                    "intent": "order_help", "products": [], "payment_method": "none", "refund_initiated_on": "",
+                    "delivered_on": "", "ordered_on": "", "flags": ["cancel_request"] if "cancel" in msg else []}
+        composed.append(user)
+        fixed = "LEFT OUT" in user
+        return {"covered": True, "decision": "answer", "evidence": [], "ticket_summary": "",
+                "reply": "Theek hai, RRN 315633825001, refund 7 se 10 din." if fixed else "Theek hai."}
+
+    monkeypatch.setattr(agent, "llm_json", llm_json)
+    monkeypatch.setattr(agent, "create_ticket", lambda *a, **k: {"created": True, "ticket_id": "T1"})
+    a = agent.Agent()
+    a.respond(f"Order number hai {order}."), a.respond(f"Last four digits {proof} hain.")
+    assert sum("LEFT OUT" in u for u in composed) == 0  # nothing required yet: one compose call per turn
+    assert needed in a.respond(ask)["reply"] and sum("LEFT OUT" in u for u in composed) == 1
+
+
+def test_post_check_failure_keeps_first_reply_and_ticket(scripted, monkeypatch):
+    llm = fake_llm({"reply": "Ticket raise kar raha hoon."})
+
+    def flaky(system, user, schema):
+        if "LEFT OUT" in user:
+            raise RuntimeError("429")
+        return llm(system, user, schema)
+
+    monkeypatch.setattr(agent, "llm_json", flaky)
+    monkeypatch.setattr(agent, "create_ticket", lambda *a, **k: {"created": True, "ticket_id": "T1"})
+    a = agent.Agent()
+    a.respond("Order number hai 1664 0894."), a.respond("Last four digits 2108 hain.")
+    r = a.respond("Mera refund kahan hai?")  # overdue refund: escalate, and the RRN is a must-state fact
+    assert (r["reply"], r["decision"], r["tool_calls"]) == ("Ticket raise kar raha hoon.", "escalate", ["create_ticket()"])
 
 
 def test_hindi_voice_caller_keeps_hindi(scripted):

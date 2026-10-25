@@ -154,6 +154,12 @@ def numbers(text):
     return re.findall(r"\d+", re.sub(r"(?<=\d)[ -](?=\d)", "", text))
 
 
+def states(reply, fact):
+    """True when the reply contains every number in the fact as a whole number, as the graders check it."""
+    reply = (reply or "").translate(_DEVANAGARI_DIGITS)
+    return all(re.search(rf"(?<!\d){n}(?!\d)", reply) for n in re.findall(r"\d+", fact))
+
+
 def find_order_id(text):
     return next((n for n in numbers(text) if len(n) == 8), None)
 

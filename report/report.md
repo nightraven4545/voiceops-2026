@@ -16,7 +16,7 @@
 **Step 3: a real conversation.** Code, not the model, owns everything that must not go wrong.
 - **Verification state machine.**
   - An order ID triggers `lookup_order(order_id)` and a request for the phone's last 4 digits or the delivery pincode.
-  - The answer triggers the verified lookup. One retry, then refusal (IDV-3).
+  - The answer triggers the verified lookup. One retry per order, then refusal (IDV-3); naming another order does not reset it.
   - Phone, pincode and customer ID are stripped from tool results, so **private data never reaches the LLM**.
 - **Policy maths in Python** (`src/rules.py`, unit-tested against the practice gold):
   - Business days count from the day *after* initiation, Mon–Sat, skipping the holiday table. This reproduces all 9 dated refund answers.
@@ -31,6 +31,7 @@
   - Replies claiming a cancellation, approval or credit, or showing private digits, are regenerated.
   - Evidence IDs that were not shown to the model are dropped.
   - **Abstention gate:** the model must mark whether the evidence actually answers the question. If not, code replaces the reply with "I don't have that information" plus an offer of a human colleague.
+  - **Must-state post-check:** where a policy requires a computed fact (the refund reference number when a verified customer asks about a refund, REF-6; the 7–10 day refund timing when a shipped order's cancellation is refused, CAN-2), code checks that the reply contains its numbers. If not, one rewrite is requested. It is kept only if it states the fact, keeps every number of the first reply and passes the other guards; on any failure the first reply stands.
 
 **Step 4: voice.**
 - **Input:** `run.py` converts any audio format to 16 kHz mono, splits it into ≤30 s pieces and transcribes with Gnani `en-IN`.
@@ -76,11 +77,12 @@ Gold-evidence recall is reported separately. Result files are in `eval/results/<
 | Same, on noisy `asr_text` | 0.45 | 0.74 | 0.85 | 0.69 | — |
 
 **Conversations: 23 conversations, 96 customer turns.**
-- 93% of turns fully correct, **100% correct decisions, 100% exactly the expected tool calls** (`lookup_order` with and without the verification value, `create_ticket`), evidence recall 0.91.
+- 96% of turns fully correct, **100% correct decisions, 100% exactly the expected tool calls** (`lookup_order` with and without the verification value, `create_ticket`), evidence recall 0.92.
+- By split: dev 72/75, held-out test 20/21. The must-state post-check was built on dev failures; no test turn triggers it, so test is unchanged (20/21 before and after).
 - Per scenario:
-  - **100%:** verification failure, high-value damage, human requested, repeat contact, return eligibility, topic switch, Express late credit, cancelling an unshipped order
-  - **88%:** compensation demand
-  - **75%:** refund status, where-is-my-order, cancelling a shipped order
+  - **100%:** verification failure, high-value damage, human requested, repeat contact, return eligibility, topic switch, Express late credit, cancelling an unshipped or a shipped order
+  - **88%:** compensation demand, refund status
+  - **75%:** where-is-my-order
 
 **Voice end to end.** A 17-file test set, made with Gnani TTS plus a silent clip, ran through `run.py` with the batch never stopping: 8 questions in three languages, two 4-turn conversations (Hinglish high-value damage, Hindi failed verification) and silence.
 - In the Hindi conversation, the caller's spoken code was read correctly: the `hi-IN` pass gives "1,266", which the extractor turns into `1266`. The agent then made the gold tool calls: verify, ask again, refuse.
@@ -102,17 +104,19 @@ Gold-evidence recall is reported separately. Result files are in `eval/results/<
 | Follow-ups ("and what if I'm not at home?"): the raw follow-up outvoted the context-aware rewrite | The raw query counts at half weight |
 | Spoken Hindi numbers: `en-IN` gave "saat hazaar…", and Gnani's `hi-IN` formatting wrote "7,746 1,439" | Hindi number words trigger the `hi-IN` pass; the extractor drops thousands separators and joins split digit groups |
 | A Hindi caller reading out digits was answered in Hinglish | The conversation keeps its language on such turns |
+| In 3 conversation turns the decision was right but a computed fact was left out (refund timing after refusing a parcel, the refund reference number) | Must-state post-check: a rewrite only for those turns (3 extra LLM calls in the whole evaluation); conversations 93% → 96% |
+| Our own review found that naming a different order reset the verification retry, allowing unlimited guesses | Failed attempts are counted per order for the whole conversation |
+| Gnani's reply WAVs carry placeholder sizes (`0xFFFFFFFF`), so strict readers saw ~24 h of audio | The file is rewritten once with real sizes after synthesis |
 | The free LLM tier ran out mid-evaluation (~550 calls/day per model) | On-disk response cache; failed rows refilled on a later run |
 | Tried down-weighting superseded sections in retrieval | Rejected: it dropped the gold `RETv3-2` for the pre-August electronics case the policy still covers |
 
 **Still open, and what we would fix next.**
-- **Facts left unstated.** In 3 conversation turns the decision was right but a computed fact was left out: the 7–10 day refund timing after refusing a parcel, or the refund reference number. Next step: a post-check that every fact tagged "must state" appears in the reply.
 - **Too cautious on "what if I'm not at home?"** (2 turns). The abstention gate is conservative there. Next step: tune the rewrite toward the documents' wording ("delivery attempt").
 - **Two single-question failures.** One unanswerable question (store pickup) still got an invented answer the gate didn't catch, and one asked an unnecessary "which colour?" before answering.
 - **Correct but differently worded.** 2 failures use a Hindi synonym the strict string scorer doesn't list ("Mujhe khed hai" for "sorry", "क्वालिटी चेक" for "quality check"). A semantic scorer would pass them.
 - **Spoken SKUs.** "ELE zero zero one two" comes back from STT as "s q le 12" and can't be recovered. Gnani's word-boosting (`bias_list`, REST only) is the next step.
 
 ## 4. Bonus work
-- **Tests:** 45 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention and language.
+- **Tests:** 55 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention, the must-state post-check and language.
 - **Evaluation tooling:** a Gnani-TTS test-audio generator; results stored per model; retrieval scored with and without the rewrite.
 - **Live demo:** a Gradio app (`app.py`) showing each turn's decision, cited sections, tool calls and verification state.

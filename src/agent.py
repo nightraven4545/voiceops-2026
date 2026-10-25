@@ -42,7 +42,8 @@ PRIVATE = {"customer_id", "delivery_pincode", "phone", "email", "found", "verifi
 LOCKED = ("Verification failed twice. Share no order details. Offer general policy help "
           "and suggest contacting support from the registered phone number.")  # IDV-3
 FORBIDDEN = re.compile(r"\b(i have|i've|we have|has been|have been)\s+(cancell?ed|approved|credited|refunded)\b"
-                       r"|(cancel|approve|refund|credit)\w* kar (diya|di)|voucher added|\+91|\b\d{6}\b|\b\d{10}\b", re.I)
+                       r"|(cancel|approve|refund|credit)\w* kar (diya|di)|(कैंसिल|रद्द|अप्रूव|रिफ़ंड|रिफंड|क्रेडिट) कर (दिया|दी)"
+                       r"|voucher added|\+91|\b\d{6}\b|\b\d{10}\b", re.I)
 GREETING = {"en": "Hi, I'm ZentroMart's AI support assistant. ",
             "hi": "नमस्ते, मैं ZentroMart की एआई सहायक हूँ। ",
             "hi-en": "Namaste, main ZentroMart ki AI support assistant hoon. "}
@@ -257,7 +258,7 @@ class Agent:
         if any(c["doc_type"] in ("faq", "marketing") or c["status"] == "superseded" for c in retrieved):
             shown.append(kb.BY_ID["KB-00.1"])
 
-        facts, catalog, flags = [], [], set(u["flags"])
+        facts, catalog, flags, must = [], [], set(u["flags"]), []
         if self.mode == "full":
             products = match_products(u["products"], norm)
             catalog = catalog_lines(products)
@@ -274,6 +275,10 @@ class Agent:
                              or (f == "high_value_damage" and ("damage" in topic or "damage_report" in flags)))
             if required is None:
                 required = self._required(flags, st, u)
+            if st.order:  # facts this situation needs said, checked after the reply is written
+                must = [f"{k}: {v}" for k, v in order_facts.items()
+                        if "refund_reference_number" in k and "refund" in topic  # REF-6
+                        or k == "if_refused_at_door" and "cancel_request" in flags and required == "refuse"]  # CAN-2
             if st.locked:
                 situation.append("Verification failed twice earlier: do not discuss that order.")
         if required == "escalate":
@@ -299,9 +304,19 @@ class Agent:
             out = llm_json(COMPOSE_SYSTEM, prompt + "\n\nYOUR PREVIOUS REPLY CLAIMED AN ACTION OR SHOWED PRIVATE DIGITS. "
                            "Rewrite it without that:\n" + out["reply"], schema)
         decision = required or out["decision"]
-        reply = out["reply"]
-        if decision == "answer" and required is None and not out["covered"]:  # abstain instead of guessing
-            reply = NOT_COVERED[u["reply_lang"]]
+        abstain = decision == "answer" and required is None and not out["covered"]  # abstain instead of guessing
+        if not abstain and (missing := [f for f in must if not rules.states(out["reply"], f)]):
+            try:  # optional quality rewrite: on any failure the first reply stands
+                fix = llm_json(COMPOSE_SYSTEM, prompt + "\n\nYOUR PREVIOUS REPLY LEFT OUT FACTS THE CUSTOMER NEEDS "
+                               "HERE. Keep everything it says (decision, any ticket or handover, dates, amounts) and "
+                               "also state these, in the same language:\n" + "\n".join(missing)
+                               + "\nPrevious reply:\n" + out["reply"], schema)
+            except Exception:
+                fix = None
+            if fix and all(rules.states(fix["reply"], f) for f in [*missing, out["reply"]]) \
+                    and not FORBIDDEN.search(fix["reply"]):
+                out = {**out, "reply": fix["reply"], "evidence": out["evidence"] + fix["evidence"]}
+        reply = NOT_COVERED[u["reply_lang"]] if abstain else out["reply"]
         if first and not re.search(r"\bAI\b|एआई", reply):
             reply = GREETING[u["reply_lang"]] + reply
 
