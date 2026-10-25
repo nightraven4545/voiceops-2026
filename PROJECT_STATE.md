@@ -1,13 +1,13 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 15:35 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 16:50 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
-- **Brief audit, 25 Oct 15:30** (all 14 pages re-read): every build requirement is met. Open items are only the demo video, making the repo public, and the final zip.
+- **Brief audit, 25 Oct 16:45** (all 14 pages re-read): every build requirement is met. Open items are only the demo video, making the repo public, and the final zip.
   - Fixed in this audit: the README got the repo URL and a Credits section; the report now explains the compensation choice. The brief's example also raises a ticket; the practice gold (PC015/16) refuses with none, and we follow the gold.
   - Interface rule (p.12): "anything that plays and records audio: a web page or a notebook". The Gradio page qualifies; UI design earns no marks.
   - Watch-out: "voice experience" judges "clear, short replies". Median reply is 30–37 words, but 12/148 exceed 50 (max 84). Pick short-answer questions for the demo.
