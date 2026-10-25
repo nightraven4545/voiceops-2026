@@ -1,7 +1,57 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, ~09:30 IST**.
+> Last updated: **25 Oct 2026, 09:05 IST** · latest commit `dec3d5f` on `origin/main` (private GitHub repo).
+
+## ▶ Handoff — start here
+**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 93%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` are done. A clean clone installs and runs (44/44 tests). What's left is mostly finishing and submitting.
+
+**In flight when the last chat ended.**
+- That chat had a background timer that, at **12:35 IST on 25 Oct**, runs `run.py` in `%USERPROFILE%\vofresh` to prove the LLM step works from a clean clone.
+- A new chat can't see that timer. Check `%USERPROFILE%\vofresh\outputs\results.csv`:
+  - If it exists, was written **after 12:30 IST**, and has no `RateLimitError` in the `error` column, the check passed.
+  - If not, rerun it (step 1 below).
+- Either way, **delete `%USERPROFILE%\vofresh`** afterwards: its `.env` holds both API keys.
+
+**Next actions, in order (deadline 26 Oct 2026):**
+1. **After 12:30 IST:** clean-clone LLM check, then delete `%USERPROFILE%\vofresh`. Commands:
+   - `cd %USERPROFILE%\vofresh && .venv\Scripts\python run.py --input sample_outputs/inputs --output outputs`
+   - check `outputs\results.csv` has no errors
+   - `rm -rf "$USERPROFILE/vofresh"`
+2. **PC021 by voice (Hindi failed verification), after 12:30 IST, ~10 LLM calls:**
+   - Run `run.py` on `test_audio/PC021`. Expect: turns in Devanagari Hindi; turn 3 `lookup_order(order_id=77461439, verification_value=1266)` → clarify; turn 4 → refuse.
+   - Then add it to `sample_outputs/`: copy the inputs, rerun into `replies`, add a README row. Commit.
+3. **Demo video, recorded by the user:** ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar) or Clipchamp. Suggested script:
+   1. English: "How long does a refund to UPI take?" → follow-up "And if I paid by card?"
+   2. Hinglish order flow: give order ID 8978 2837, then last 4 digits 4533, then "TV damaged, replacement approve kar do" → ticket + handover
+   3. "Is there a student discount?" → "I don't have that information"
+
+   Keep the details panel (sources, tool calls) visible. Save as `demo.mp4`.
+4. **Ask the organizers on Discord:**
+   - whose LLM key runs the test (free tier ≈ 500 calls/day; a 200-file run needs ≈ 400)
+   - how multi-turn audio is delivered (we treat each sub-folder as one conversation)
+   - output schema
+   - retrieval metric
+   - deadline time
+5. **Optional, only with spare time and quota:**
+   - a post-check that "must state" computed facts (refund timing, RRN) appear in the reply
+   - softer abstention on "what if I'm not home?"
+
+   Each change needs an eval rerun (full + conversations ≈ 300 calls), so don't start this on submission day.
+6. **Submission:**
+   - make the repo public: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences`
+   - build `<team>_voiceops.zip` with `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf` (copied from `report/`), `demo.mp4`, `sample_outputs/`
+   - leave out `.env`, any venv, the dataset copy, `.cache`, `outputs/` and `test_audio/`
+   - put the public repo URL in the submission
+7. **After submission:** rotate the Gnani and Gemini keys; both were pasted in chat.
+
+**Don't redo or undo:**
+- the model choice (Gemini 3.1 free; the $100 is Claude Code cloud credit, not API)
+- the per-model results folders
+- the rejected superseded-section down-weighting
+- the gold-aligned decisions: unanswerable → `answer`; compensation → `refuse`
+
+**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free.
 
 ## Goal and deadline
 IIT-G C&A × Gnani.ai "VoiceOps 2026": a voice customer-support agent for the fictional store ZentroMart. Brief: `C:\Users\shres\OneDrive\Documents\capstone_AI_ML\6ad64c83eae85_voiceops_2026_capstone_brief.pdf`.
@@ -77,7 +127,8 @@ Remaining failures:
 - Ponytail: 4 source modules, stdlib first, no frameworks. Each fix must be general behaviour, never question-specific.
 - Repo stays private until just before submission. Commits only as the user's noreply identity.
 
-## Next steps
+## Checklist history
+*(The order of work is in "Handoff → Next actions" above; this is the running record.)*
 - [x] Refill missing 3.1 rows: all complete.
 - [x] Report: every number taken from the CSVs; 3.5 vs 3.1 comparison included.
 - [x] Voice: a Hindi caller stays in Hindi when reading out digits (`State.lang`). Verified live on PC021 turn 2.
@@ -125,6 +176,27 @@ Remaining failures:
   - `dataset.md`: traps and the date-rule proof
 - **Full plan with rationale and the GPT-report comparison:** `C:\Users\shres\.claude\plans\c-users-shres-downloads-capstone-projec-mellow-volcano.md`
 - **Git-ignored working output:** generated test audio in `test_audio/` and voice-run output in `outputs/`.
+
+## Prompt to start a new chat
+Paste this as the first message of a new Claude Code chat opened in the repo folder:
+
+```text
+I'm continuing my VoiceOps 2026 capstone (ZentroMart voice support agent, IIT-G C&A × Gnani.ai).
+Repo: C:\Users\shres\OneDrive\Documents\claude\gnani (private GitHub: nightraven4545/voiceops-2026). Deadline: 26 Oct 2026.
+
+1. Read PROJECT_STATE.md fully (start with "Handoff — start here"), then CLAUDE.md. Run `git log --oneline -8` and `git status`.
+2. Check what's in flight: the clean-clone LLM check in %USERPROFILE%\vofresh (see the handoff) and the time vs the 12:30 IST Gemini quota reset.
+3. Tell me in 5 short lines where things stand and what you'll do next, then do the first open item in "Next actions".
+
+Rules:
+- commit only as my noreply identity, never with AI co-author lines
+- never print or commit keys from .env
+- Gnani is the only STT/TTS
+- ponytail (minimal code)
+- every fix must be general, never question-specific
+- after each milestone, update PROJECT_STATE.md and commit + push
+- ask me before anything outward-facing or irreversible: making the repo public, deleting anything outside the repo except %USERPROFILE%\vofresh, spending money, messaging anyone
+```
 
 ## Gotchas (each cost time once)
 - **Gemini free quota** is per model and resets at **midnight Pacific = 12:30 IST**, not midnight IST.
