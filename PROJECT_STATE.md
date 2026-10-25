@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 21:05 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 21:10 IST** · latest commit on `origin/main` (**public** GitHub repo since 25 Oct 21:08).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -52,7 +52,7 @@
    - ~~a post-check that "must state" computed facts (refund timing, RRN) appear in the reply~~: done 25 Oct (see Checklist history)
    - ~~softer abstention on "what if I'm not home?" (PC011/PC012)~~: done 25 Oct as a "second look" (see Checklist history)
 6. **Submission:**
-   - make the repo public: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences`
+   - ~~make the repo public~~: **done 25 Oct 21:08** with the user's go-ahead. Verified while signed out: the repo, README (repository URL + clone command) and demo.mp4 return HTTP 200. Before going public, the whole history (23 commits) was checked: `.env` was never committed and neither key appears anywhere.
    - build `Dstonks_voiceops.zip` (team name: **Dstonks**). The layout is the brief's p.14 "Submission ZIP structure": `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf`, `demo.mp4`, `sample_outputs/`; no `.env`, keys, venv or dataset copy. From the repo root, after committing everything (git archive takes only committed files; `--add-file` puts a file at the zip root):
      `git archive --format=zip -9 --add-file=report/report.pdf --add-file=demo.mp4 -o Dstonks_voiceops.zip HEAD README.md .env.example requirements.txt run.py src sample_outputs`
    - **Trial run 25 Oct 14:55** (without demo.mp4): 80 files, 10.4 MB. A scan with the real key values found neither key, no key patterns and no forbidden paths. Extracted to a fresh folder, the documented command answered PQ0003 end to end (live LLM, Gnani in and out, valid WAV) in 31 s.
@@ -63,7 +63,6 @@
      - A fresh extract plus `run.py` on PQ0003 answered correctly (REF-2), with a valid 6.2 s WAV and no errors (run on 3.5 because 3.1 was overloaded).
      - **Rebuild it if anything is committed after `c5e4efa`.**
    - still needed:
-     - **make the repo public (ask the user first)**
      - the user uploads the zip and the repo URL on the course site
      - afterwards, rotate both keys
    - put the public repo URL in the submission
@@ -112,7 +111,7 @@ Submission:
 | Voice end to end | 17/17 files processed, batch never stops. PC021 (Hindi, failed verification twice) verified live on 25 Oct: 4/4 turns pass the practice gold, replies in Devanagari, no private data in any Gemini prompt or reply. Reply WAVs now carry real header sizes |
 | Report | `report/report.md` → `report/report.pdf` (4 pages, A4: the limit). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
 | Sample outputs | `sample_outputs/`: 17 files (8 questions, PC002 and PC021 conversations, silence), replayed from cached LLM answers with live calls blocked (`LLM_BASE_URL` pointed at a dead port); 0 errors |
-| Git | **Private** repo https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
+| Git | **Public** repo (since 25 Oct 21:08) https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
 
 ## Results (practice set, `eval/results/<model>/`)
 | Model | Step 1 baseline | Step 2 RAG | Full agent | Full, `asr_text` | Conversations (turns) | Tool calls |
@@ -240,7 +239,7 @@ Paste this as the first message of a new Claude Code chat opened in the repo fol
 
 ```text
 I'm continuing my VoiceOps 2026 capstone (ZentroMart voice support agent, IIT-G C&A × Gnani.ai).
-Repo: C:\Users\shres\OneDrive\Documents\claude\gnani (private GitHub: nightraven4545/voiceops-2026). Deadline: 26 Oct 2026.
+Repo: C:\Users\shres\OneDrive\Documents\claude\gnani (public GitHub: nightraven4545/voiceops-2026). Deadline: 26 Oct 2026.
 
 1. Read PROJECT_STATE.md fully (start with "Handoff — start here"), then CLAUDE.md. Run `git log --oneline -8` and `git status`.
 2. Check what's in flight (see the handoff) and the time vs the 12:30 IST Gemini quota reset.
