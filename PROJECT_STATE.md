@@ -1,23 +1,18 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 09:05 IST** · latest commit `dec3d5f` on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 13:00 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 93%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` are done. A clean clone installs and runs (44/44 tests). What's left is mostly finishing and submitting.
 
-**In flight when the last chat ended.**
-- That chat had a background timer that, at **12:35 IST on 25 Oct**, runs `run.py` in `%USERPROFILE%\vofresh` to prove the LLM step works from a clean clone.
-- A new chat can't see that timer. Check `%USERPROFILE%\vofresh\outputs\results.csv`:
-  - If it exists, was written **after 12:30 IST**, and has no `RateLimitError` in the `error` column, the check passed.
-  - If not, rerun it (step 1 below).
-- Either way, **delete `%USERPROFILE%\vofresh`** afterwards: its `.env` holds both API keys.
+**In flight:** nothing.
+- The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
+- Live latency on the free tier: median 20.9 s per voice turn (9–49 s).
+- `%USERPROFILE%\vofresh`, including its `.env` copy of the keys, has been **deleted**.
 
 **Next actions, in order (deadline 26 Oct 2026):**
-1. **After 12:30 IST:** clean-clone LLM check, then delete `%USERPROFILE%\vofresh`. Commands:
-   - `cd %USERPROFILE%\vofresh && .venv\Scripts\python run.py --input sample_outputs/inputs --output outputs`
-   - check `outputs\results.csv` has no errors
-   - `rm -rf "$USERPROFILE/vofresh"`
+1. ~~Clean-clone LLM check + delete `vofresh`~~: done (see above).
 2. **PC021 by voice (Hindi failed verification), after 12:30 IST, ~10 LLM calls:**
    - Run `run.py` on `test_audio/PC021`. Expect: turns in Devanagari Hindi; turn 3 `lookup_order(order_id=77461439, verification_value=1266)` → clarify; turn 4 → refuse.
    - Then add it to `sample_outputs/`: copy the inputs, rerun into `replies`, add a README row. Commit.
@@ -145,7 +140,7 @@ Remaining failures:
   - **44/44 tests** pass without `PYTHONUTF8`
   - `run.py` on `sample_outputs/inputs` processed 13/13 files: Gnani STT transcripts, 13 reply WAVs, the silence fallback, and the batch never stopped
   - Two README fixes came out of it: clone into a **short path** on Windows (torch exceeds the 260-char path limit), and use `python -m pip` (Smart App Control blocked the new venv's `pip.exe`)
-- [ ] After 12:30 IST: rerun `run.py` in `%USERPROFILE%\vofresh` to confirm the LLM step from a clean clone (it got 429s at 09:00 because the quota was spent). Then **delete `%USERPROFILE%\vofresh`**: it holds a copy of `.env` with both keys.
+- [x] Clean-clone LLM step verified at 12:48 IST: 13/13 files, live calls, 0 errors. `%USERPROFILE%\vofresh` deleted, keys included.
 - [x] Create the private GitHub repo and push (25 Oct). This also lets Claude Code cloud sessions run on the $100 credit.
 - [ ] At submission: make the repo public, then build the submission zip.
 - [ ] Ask the organizers (Discord):
@@ -185,7 +180,7 @@ I'm continuing my VoiceOps 2026 capstone (ZentroMart voice support agent, IIT-G 
 Repo: C:\Users\shres\OneDrive\Documents\claude\gnani (private GitHub: nightraven4545/voiceops-2026). Deadline: 26 Oct 2026.
 
 1. Read PROJECT_STATE.md fully (start with "Handoff — start here"), then CLAUDE.md. Run `git log --oneline -8` and `git status`.
-2. Check what's in flight: the clean-clone LLM check in %USERPROFILE%\vofresh (see the handoff) and the time vs the 12:30 IST Gemini quota reset.
+2. Check what's in flight (see the handoff) and the time vs the 12:30 IST Gemini quota reset.
 3. Tell me in 5 short lines where things stand and what you'll do next, then do the first open item in "Next actions".
 
 Rules:
