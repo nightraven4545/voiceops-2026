@@ -37,7 +37,7 @@ Submission:
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
 | Voice end to end | 17/17 files processed, batch never stops; Hindi digits verified live (PC021). Hindi-language fix verified on turn 2; turns 3–4 hit the daily quota on the retest |
 | Report | `report/report.md` complete, ~2.5 pages, every number checked against the CSVs; needs PDF export |
-| Git | Local commits only, author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. **No GitHub repo yet** (user's choice) |
+| Git | **Private** repo https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
 
 ## Results (practice set, `eval/results/<model>/`)
 | Model | Step 1 baseline | Step 2 RAG | Full agent | Full, `asr_text` | Conversations (turns) | Tool calls |
@@ -86,7 +86,8 @@ Remaining failures:
 - [ ] report.pdf (≤4 pp).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.
 - [ ] Fresh-clone check: follow the README exactly in a temp folder.
-- [ ] Create the GitHub repo, push, and make it public at submission; build the submission zip.
+- [x] Create the private GitHub repo and push (25 Oct). This also lets Claude Code cloud sessions run on the $100 credit.
+- [ ] At submission: make the repo public, then build the submission zip.
 - [ ] Ask the organizers (Discord):
   - whose LLM key runs the test (a free tier is ~500 calls/day; a 200-file run needs ~400)
   - how multi-turn audio is delivered
