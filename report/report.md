@@ -113,6 +113,6 @@ Gold-evidence recall is reported separately. Result files are in `eval/results/<
 - **Spoken SKUs.** "ELE zero zero one two" comes back from STT as "s q le 12" and can't be recovered. Gnani's word-boosting (`bias_list`, REST only) is the next step.
 
 ## 4. Bonus work
-- **Tests:** 44 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention and language.
+- **Tests:** 45 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention and language.
 - **Evaluation tooling:** a Gnani-TTS test-audio generator; results stored per model; retrieval scored with and without the rewrite.
 - **Live demo:** a Gradio app (`app.py`) showing each turn's decision, cited sections, tool calls and verification state.

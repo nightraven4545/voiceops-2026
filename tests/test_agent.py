@@ -63,6 +63,17 @@ def test_failed_verification_twice(scripted):  # practice PC021
     assert "IDV-3" in second["sources"] and a.state.order is None and a.state.locked
 
 
+def test_switching_orders_keeps_the_lock(scripted):  # IDV-3: naming another order must not reset the retries
+    a = scripted()
+    for m in ["Order number hai 7746 1439.", "Last four digits 1266 hain.", "Last four digits 1266 hain."]:
+        a.respond(m)
+    a.respond("Order number hai 8978 2837.")
+    assert a.respond("Last four digits 4533 hain.")["decision"] == "answer" and a.state.order  # other orders still verify
+    back = a.respond("Order number hai 7746 1439.")
+    assert back["decision"] == "refuse" and "IDV-3" in back["sources"] and a.state.order is None
+    assert a.respond("Last four digits 1263 hain.")["tool_calls"] == []  # no third guess, even the right one
+
+
 def test_hindi_voice_caller_keeps_hindi(scripted):
     a = scripted()
     a.state.lang = "hi"  # earlier turn was answered in Hindi

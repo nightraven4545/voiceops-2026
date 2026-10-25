@@ -102,4 +102,5 @@ def speak(text, lang, out_path):
         _tts = _tts or GnaniTTSClient()
         _retry(_tts.synthesize, spoken, voice=voice, model=TTS_MODEL, language=language,
                audio_config=AudioConfig(sample_rate=24000), output_file=str(out_path))
+    sf.write(out_path, *sf.read(out_path, dtype="int16"))  # Gnani streams 0xFFFFFFFF size fields; store the real ones
     return spoken

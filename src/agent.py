@@ -39,6 +39,8 @@ FLAGS = ["wants_human", "unauthorized_activity", "legal_threat", "safety_risk", 
          "compensation_demand", "cancel_request", "damage_report"]
 HANDOVER_FLAGS = {"wants_human", "unauthorized_activity", "legal_threat", "safety_risk"}  # ESC-1.2/3/6/7
 PRIVATE = {"customer_id", "delivery_pincode", "phone", "email", "found", "verified", "verification_required"}
+LOCKED = ("Verification failed twice. Share no order details. Offer general policy help "
+          "and suggest contacting support from the registered phone number.")  # IDV-3
 FORBIDDEN = re.compile(r"\b(i have|i've|we have|has been|have been)\s+(cancell?ed|approved|credited|refunded)\b"
                        r"|(cancel|approve|refund|credit)\w* kar (diya|di)|voucher added|\+91|\b\d{6}\b|\b\d{10}\b", re.I)
 GREETING = {"en": "Hi, I'm ZentroMart's AI support assistant. ",
@@ -181,6 +183,7 @@ class State:
     attempts: int = 0
     order: dict = None                          # verified order, private fields removed
     locked: bool = False                        # two failed verifications (IDV-3)
+    failed: dict = field(default_factory=dict)  # order ID -> failed verifications; survives switching orders
     ticket_id: str = None
 
 
@@ -203,14 +206,20 @@ class Agent:
         verification_turn = False
         oid = rules.find_order_id(norm) or (alt_text and rules.find_order_id(rules.normalize_asr(alt_text)))
         if self.mode == "full" and oid and oid != st.order_id:
-            st.order_id, st.order, st.attempts, st.locked, st.awaiting_proof = oid, None, 0, False, True
+            st.attempts = st.failed.get(oid, 0)  # switching orders must not reset the retry limit
+            st.order_id, st.order, st.locked, st.awaiting_proof = oid, None, st.attempts >= 2, st.attempts < 2
             lookup_order(oid)
             tool_calls.append(f"lookup_order(order_id={oid})")
             code_ev.add("IDV-2")
-            situation.append(f"The customer gave order ID {oid}. Before sharing anything about it, ask them to verify "
-                             "with either the last 4 digits of the registered phone number or the delivery pincode "
-                             "of the order (they choose one).")
-            required = "clarify"
+            if st.locked:
+                code_ev.add("IDV-3")
+                situation.append(LOCKED)
+                required = "refuse"
+            else:
+                situation.append(f"The customer gave order ID {oid}. Before sharing anything about it, ask them to "
+                                 "verify with either the last 4 digits of the registered phone number or the delivery "
+                                 "pincode of the order (they choose one).")
+                required = "clarify"
         elif self.mode == "full" and st.awaiting_proof and (
                 proof := rules.find_proof(norm) or (alt_text and rules.find_proof(alt_text))):
             verification_turn = True
@@ -224,11 +233,11 @@ class Agent:
                 required = "answer"
             else:
                 st.attempts += 1
+                st.failed[st.order_id] = st.attempts
                 code_ev.add("IDV-3")
                 if st.attempts >= 2:
                     st.locked, st.awaiting_proof = True, False
-                    situation.append("Verification failed twice. Share no order details. Offer general policy help "
-                                     "and suggest contacting support from the registered phone number.")
+                    situation.append(LOCKED)
                     required = "refuse"
                 else:
                     situation.append("Verification did not match. Say the details don't match and ask the customer "
