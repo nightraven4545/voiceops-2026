@@ -15,12 +15,12 @@ The LLM only understands and phrases. Dates, return windows, refund timelines, v
 
 ## Setup
 
-Python 3.11 or 3.12.
+Python 3.11 or 3.12. **On Windows, clone into a short path** (e.g. `C:\voiceops`): torch's installed file paths are long, and without [long-path support](https://pip.pypa.io/warnings/enable-long-paths) `pip install` fails inside deep folders.
 
 ```bash
 python -m venv .venv
 .venv/Scripts/activate            # Windows; on macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt   # `python -m pip` also works where Windows blocks the pip.exe launcher
 cp .env.example .env              # then fill in the keys
 ```
 

@@ -89,7 +89,12 @@ Remaining failures:
 - [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
 - [x] report.pdf (3 pages).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.
-- [ ] Fresh-clone check: follow the README exactly in a temp folder.
+- [x] Fresh-clone check (25 Oct, `%USERPROFILE%\vofresh`), following the README exactly:
+  - install OK and `pip check` clean
+  - **44/44 tests** pass without `PYTHONUTF8`
+  - `run.py` on `sample_outputs/inputs` processed 13/13 files: Gnani STT transcripts, 13 reply WAVs, the silence fallback, and the batch never stopped
+  - Two README fixes came out of it: clone into a **short path** on Windows (torch exceeds the 260-char path limit), and use `python -m pip` (Smart App Control blocked the new venv's `pip.exe`)
+- [ ] After 12:30 IST: rerun `run.py` in `%USERPROFILE%\vofresh` to confirm the LLM step from a clean clone (it got 429s at 09:00 because the quota was spent). Then **delete `%USERPROFILE%\vofresh`**: it holds a copy of `.env` with both keys.
 - [x] Create the private GitHub repo and push (25 Oct). This also lets Claude Code cloud sessions run on the $100 credit.
 - [ ] At submission: make the repo public, then build the submission zip.
 - [ ] Ask the organizers (Discord):
