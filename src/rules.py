@@ -135,7 +135,14 @@ def _digits(m):
     strong = sum(w in _DIGIT for w in words)
     weak = len(words) - strong
     # "five to seven days" must stay words; "zero zero to three" / "to zero to six" are IDs/years
-    return digits if strong >= 2 and (not weak or len(digits) >= 4) else m[0]
+    if not (strong >= 2 and (not weak or len(digits) >= 4)):
+        return m[0]
+    if len(digits) == 7:  # no ID here has 7 digits: an edge "to"/"for" is a word ("deliver to 411045")
+        if words[0] in _WEAK:
+            return f"{words[0]} {digits[1:]}"
+        if words[-1] in _WEAK:
+            return f"{digits[:-1]} {words[-1]}"
+    return digits
 
 
 def normalize_asr(text):

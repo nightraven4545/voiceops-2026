@@ -1,10 +1,10 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 17:15 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 19:50 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
-**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
+**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
 - **Brief audit, 25 Oct 16:45** (all 14 pages re-read): every build requirement is met. Open items are only the demo video, making the repo public, and the final zip.
@@ -60,7 +60,7 @@
 - the rejected superseded-section down-weighting
 - the gold-aligned decisions: unanswerable → `answer`; compensation → `refuse`
 
-**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free. Used on 25 Oct after the reset: about 44 (clean clone 24, PC021 3, post-check 3, second look 10, samples 2, zip smoke test 2). The second look adds 1 call per abstaining turn (about 5% of turns), so a 200-file run needs ≈ 410.
+**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free. Used on 25 Oct after the reset: about 62 (clean clone 24, PC021 3, post-check 3, second look 10, samples 2, zip smoke test 2, pincode spot-check 12, demo testing ~6). The second look adds 1 call per abstaining turn (about 5% of turns), so a 200-file run needs ≈ 410.
 
 ## Goal and deadline
 IIT-G C&A × Gnani.ai "VoiceOps 2026": a voice customer-support agent for the fictional store ZentroMart. Brief: `C:\Users\shres\OneDrive\Documents\capstone_AI_ML\6ad64c83eae85_voiceops_2026_capstone_brief.pdf`.
@@ -92,7 +92,7 @@ Submission:
 | Area | State |
 |---|---|
 | Agent (`src/`), batch runner (`run.py`), demo (`app.py`) | Built and working |
-| Rule + agent tests | 64 passing (`python -m pytest tests`) |
+| Rule + agent tests | 80 passing (`python -m pytest tests`) |
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
 | Voice end to end | 17/17 files processed, batch never stops. PC021 (Hindi, failed verification twice) verified live on 25 Oct: 4/4 turns pass the practice gold, replies in Devanagari, no private data in any Gemini prompt or reply. Reply WAVs now carry real header sizes |
 | Report | `report/report.md` → `report/report.pdf` (4 pages, A4: the limit). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
@@ -164,7 +164,22 @@ Remaining failures:
   - **Cost and result:** a cache-only replay showed exactly 10 new calls across all three evals: the 2 targets plus the 8 correct abstentions (PQ0004/09/15/37 clean, PQ0009/15/37/53 ASR). Live: all 8 still abstain, and PC011/PC012-t4 now pass citing DEL-3. Conversations 92 → 94/96 (dev 72 → 74/75; test 20/21 unchanged, since no test turn could change). Question evals byte-identical.
   - **Reviewed** by 3 read-only reviewers before any quota was spent. From the review: answer-only acceptance, content-only "new" sections, the measure-against-shown fix, the cite-everything rejection, the wide prompt carried into the post-check, fail-fast optional calls, and 9 test rows. A mutation check showed every guard is pinned by a test.
   - **Samples:** PQ0002 and PQ0004 now take the second look (2 live calls). Both still abstain with identical text, so the committed `sample_outputs` were kept and their second-look answers are cached. The demo's "Is there a student discount?" still abstains (checked live; cached).
-  - **Still failing:** PQ0053 (clean) and PQ0004 (ASR) invent an answer with `covered=true`, so they never reach the gate. An unrelated 7 and 10 in the reply count as stated. Facts with dates or ₹ amounts would need normalisation before being added to `must`.
+  - **Still failing:** PQ0053 (clean) and PQ0004 (ASR) invent an answer with `covered=true`, so they never reach the gate.
+- [x] **Pincode-table facts** (25 Oct evening). Found by checking the brief's dataset pages: `pincodes.csv` was never used, yet DEL-5 says delivery, COD and Express depend on it (15 pincodes have no Express, 2 no COD, 2 aren't served). No practice item asks about it; the hidden test may.
+  - **Behaviour:** `Agent._pincode_facts` adds a COMPUTED FACT via `table_fact` (metro, delivery, COD with "other PAY-2 conditions still apply", Express), citing DEL-5 and `pincodes.csv:<pin>`.
+    - It fires for a 6-digit number in the table, or an unlisted one only when the caller says "pin"/"पिन" (worded conditionally). Amounts, OTPs and dates are left alone.
+    - It also fires for a table city or alias ("Leh", "Bangalore"). If a city's pincodes disagree (Pune, Kolkata): "varies by pincode, so ask which one".
+    - It is skipped while identity is being verified (`verification_turn or st.awaiting_proof`).
+    - The hi-IN transcript is only a fallback.
+  - `rules._digits`: a 7-digit spoken run keeps an edge "to"/"for" as a word ("deliver to four one one zero four five" → "deliver to 411045").
+  - **Checks:**
+    - 80 tests, and every new guard is mutation-checked.
+    - Cache-only replay of all 200 practice turns: 0 misses, so scores are unchanged.
+    - Replay of the 16 spoken sample turns: identical.
+    - Reviewed by 3 read-only reviewers.
+    - Live spot-check of 6 questions (Express 411045, COD 248001, Leh, Kolkata, unlisted 999999, metro days 560034): all correct.
+  - **Known:** when the model repeats the caller's own pincode, `FORBIDDEN` asks for one rewrite (+2–4 s), and the rewrite may still keep the digits. It's harmless (the caller's own number) and left alone the day before the deadline.
+- [x] **Demo UI polish** (`app.py`, text only, no logos): title "ZentroMart voice support · Team Dstonks"; instructions naming the sources; footer "Team Dstonks (Shreshtha) · VoiceOps 2026 capstone, IIT Guwahati Consulting & Analytics Club × Gnani.ai · Speech: Gnani STT and TTS · Language model: Gemini"; `gr.themes.Soft()` via `launch()` (Gradio 6). An unrelated 7 and 10 in the reply count as stated. Facts with dates or ₹ amounts would need normalisation before being added to `must`.
 - [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
 - [x] report.pdf (3 pages).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.

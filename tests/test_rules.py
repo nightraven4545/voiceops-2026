@@ -80,6 +80,9 @@ def test_order_facts_flags_from_tool():
     ("how long does a refund to u p i take", "upi"),
     ("if i paid with net banking how soon will the re fund show up", "refund"),
     ("last four digits four five three three", "4533"),
+    ("can you deliver to four one one zero four five", "deliver to 411045"),  # an edge "to" stays a word
+    ("is cod available for two four eight zero zero one", "for 248001"),
+    ("five six zero zero three four for my order", "560034 for my order"),
 ])
 def test_normalize_asr(raw, expected):
     assert expected in rules.normalize_asr(raw)

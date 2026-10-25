@@ -30,9 +30,10 @@ def turn(audio, typed, agent, chat):
     return chat, wav, details, agent, chat, None, ""
 
 
-with gr.Blocks(title="ZentroMart voice support") as demo:
-    gr.Markdown("## ZentroMart support · AI assistant\nRecord a question (English, Hindi or Hinglish), "
-                "or type one. Speech in and out is Gnani.")
+with gr.Blocks(title="ZentroMart voice support · Team Dstonks") as demo:
+    gr.Markdown("## ZentroMart voice support · AI assistant\nAsk by voice (English, Hindi or Hinglish) or type. "
+                "Answers come only from ZentroMart's policy documents and store data (catalog, pincode table, "
+                "verified orders); the details below show the sources and tool calls.")
     agent_state, chat_state = gr.State(None), gr.State([])
     chatbot = gr.Chatbot(label="Conversation", height=380)
     with gr.Row():
@@ -43,10 +44,12 @@ with gr.Blocks(title="ZentroMart voice support") as demo:
         send = gr.Button("Send", variant="primary")
         reset = gr.Button("New call")
     details = gr.Markdown()
+    gr.Markdown("<sub>Team Dstonks (Shreshtha) · VoiceOps 2026 capstone, IIT Guwahati Consulting & Analytics Club × "
+                "Gnani.ai · Speech: Gnani STT and TTS · Language model: Gemini</sub>")
     outputs = [chatbot, reply_audio, details, agent_state, chat_state, mic, typed]
     send.click(turn, [mic, typed, agent_state, chat_state], outputs)
     typed.submit(turn, [mic, typed, agent_state, chat_state], outputs)
     reset.click(lambda: ([], None, "", None, [], None, ""), None, outputs)
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=gr.themes.Soft())

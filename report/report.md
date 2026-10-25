@@ -23,6 +23,7 @@
   - Return windows are calendar days, with the RET-3 exception (pre-August electronics: 10 days) and RET-8 (festive fashion: 30 days).
   - Refund arrival ranges per payment method, and the "more than 3 business days overdue" check.
   - The ₹49 pickup fee, refund timing after refusing at the door, and the refund reference number.
+  - Delivery, cash on delivery, Express and metro status for a pincode or city the caller names, from the pincode table (DEL-5, DEL-1).
 - **Policy-owned decisions.**
   - The ESC-1 triggers force an escalation: human requested, fraud, legal, safety, ≥2 earlier contacts, item > ₹10,000, or an overdue refund. The model cannot escalate on its own.
   - A compensation demand is refused unless it is the one case DEL-4 pays for (a late Express order). The brief's example also raises a ticket here; the practice gold refuses without one, and we follow the gold. A caller who then asks for a person still gets a ticket and a handover.
@@ -117,6 +118,6 @@ Gold-evidence recall is reported separately. Result files are in `eval/results/<
 - **Spoken SKUs.** "ELE zero zero one two" comes back from STT as "s q le 12" and can't be recovered. Gnani's word-boosting (`bias_list`, REST only) is the next step.
 
 ## 4. Bonus work
-- **Tests:** 64 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention and its second look, the must-state post-check and language.
+- **Tests:** 80 automated tests, including scripted-LLM conversation tests (no API calls) for verification, ticket rules, abstention and its second look, the must-state post-check and language.
 - **Evaluation tooling:** a Gnani-TTS test-audio generator; results stored per model; retrieval scored with and without the rewrite.
 - **Live demo:** a Gradio app (`app.py`) showing each turn's decision, cited sections, tool calls and verification state.

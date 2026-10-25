@@ -30,6 +30,16 @@ MIN_GAP = float(os.getenv("LLM_MIN_SECONDS", "0"))  # spacing between calls for 
 CACHE = ROOT / ".cache" / "llm"
 with open(rules.DATASET / "data" / "products.csv", encoding="utf-8") as f:
     PRODUCTS = {p["sku"]: p for p in csv.DictReader(f)}
+with open(rules.DATASET / "data" / "pincodes.csv", encoding="utf-8") as f:
+    PINCODES = {p["pincode"]: p for p in csv.DictReader(f)}
+CITIES = {}  # "pune" -> its pincode rows, plus common older or short names
+for p in PINCODES.values():
+    CITIES.setdefault(p["city"].lower(), []).append(p)
+for alias, city in {"bangalore": "bengaluru", "bombay": "mumbai", "delhi": "new delhi", "gurgaon": "gurugram",
+                    "mysore": "mysuru", "calcutta": "kolkata", "vizag": "visakhapatnam", "cochin": "kochi",
+                    "madras": "chennai"}.items():
+    CITIES[alias] = CITIES[city]
+CITY_RE = re.compile(r"\b(%s)\b" % "|".join(sorted(map(re.escape, CITIES), key=len, reverse=True)), re.I)
 STEMS = {}  # "nimbus x2 wireless earbuds" -> every colour variant's SKU
 for p in PRODUCTS.values():
     STEMS.setdefault(p["title"].split(",")[0].lower(), []).append(p["sku"])
@@ -176,6 +186,15 @@ def _catalog_line(group):
             f"sold by {p['fulfilled_by']} | ZentroMart Assured: {assured} | brand warranty {p['warranty_months']} months")
 
 
+def table_fact(label, rows):
+    """DEL-5 / DEL-1: delivery, cash on delivery, Express and metro status come from the pincode table."""
+    def col(k):
+        v = {r[k] for r in rows}
+        return "varies by pincode, so ask which one" if len(v) > 1 else "yes" if v == {"True"} else "no"
+    return (f"{label}: metro city {col('metro')}, delivery {col('serviceable')}, cash on delivery enabled "
+            f"{col('cod_available')} (other PAY-2 COD conditions still apply), Express {col('express_available')}")
+
+
 def evidence_for(retrieved):
     """Sections the model sees, strongest authority first; the KB's authority note joins when weaker sources do."""
     shown = list(retrieved)
@@ -272,6 +291,8 @@ class Agent:
             catalog = catalog_lines(products)
             code_ev.update(f"products.csv:{p['sku']}" for p in products)
             facts += self._general_facts(u, products, code_ev)
+            if not (verification_turn or st.awaiting_proof):  # a pincode said to verify identity is a proof
+                facts += self._pincode_facts(norm, alt_text, code_ev)
             if "damage_report" in flags and any(int(p["price_inr"]) > rules.HIGH_VALUE for p in products):
                 flags.add("high_value_damage")
             if st.order:
@@ -384,6 +405,29 @@ class Agent:
                 days = rules.return_days(p["return_category"], placed=u["ordered_on"])
                 if days:
                     facts.append(f"{p['sku']} ordered {u['ordered_on']}: {days}-day return window from delivery")
+        return facts
+
+    @staticmethod
+    def _pincode_facts(norm, alt_text, code_ev):
+        """Pincode-table facts for pincodes or cities the customer names (DEL-5, DEL-1). The hi-IN transcript is a
+        fallback, as for order IDs, so two hearings of one number can't give two answers."""
+        pins = [n for n in rules.numbers(norm) if len(n) == 6] or \
+            [n for n in rules.numbers(rules.normalize_asr(alt_text or "")) if len(n) == 6]
+        facts = []
+        for pin in dict.fromkeys(pins):
+            if pin in PINCODES:
+                p = PINCODES[pin]
+                facts.append(table_fact(f"pincode {pin} ({p['city']}, {p['state']})", [p]))
+                code_ev.update({"DEL-5", f"pincodes.csv:{pin}"})
+            elif re.search(r"\bpin|पिन", f"{norm} {alt_text or ''}", re.I):  # else it may be an amount, OTP or date
+                facts.append(f"if the customer meant {pin} as a delivery pincode: it is not in ZentroMart's pincode "
+                             "table, so ZentroMart does not deliver there")
+                code_ev.add("DEL-5")
+        if not pins:
+            for city in dict.fromkeys(c.lower() for c in CITY_RE.findall(norm)):
+                rows = CITIES[city]
+                facts.append(table_fact(f"{rows[0]['city']} ({len(rows)} pincode(s) in the table)", rows))
+                code_ev.add("DEL-5")
         return facts
 
     @staticmethod

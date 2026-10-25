@@ -151,6 +151,43 @@ def test_second_look_before_abstaining(monkeypatch, mode, second, answered):  # 
     assert r["reply"].endswith(agent.NOT_COVERED["en"]) is not answered
 
 
+@pytest.mark.parametrize("rows, says", [
+    (["560034"], "metro city yes, delivery yes, cash on delivery enabled yes"),
+    (["411045"], "Express no"),                    # a metro pincode without Express
+    (["248001"], "cash on delivery enabled no"),
+    (["194101"], "delivery no"),                   # listed but not served
+    (["411045", "411014"], "Express varies by pincode, so ask which one")])  # Pune's two pincodes differ
+def test_table_fact(rows, says):  # DEL-5, DEL-1
+    assert says in agent.table_fact("x", [agent.PINCODES[p] for p in rows])
+
+
+@pytest.mark.parametrize("say, alt, fact", [
+    ("Can I get Express delivery to 411 045?", None, "pincode 411045 (Pune, Maharashtra): metro city yes, delivery yes"),
+    ("can i get express delivery to four one one zero four five", None, "pincode 411045 (Pune"),   # spoken digits
+    ("express pe delivery hogi kya", "४११०४५ पर एक्सप्रेस डिलीवरी होगी?", "pincode 411045 (Pune"),  # hi-IN fallback
+    ("Do you deliver to pincode 999999?", None, "if the customer meant 999999 as a delivery pincode"),
+    ("Do you deliver to Leh?", None, "Leh (1 pincode(s) in the table): metro city no, delivery no"),
+    ("I paid 125000 for the TV, refund kab milega?", None, None),         # an amount is not a pincode
+    ("Order number hai 1591 1102, pincode 440010.", None, None)])        # identity proof, not a delivery question
+def test_pincode_and_city_facts(monkeypatch, say, alt, fact):
+    prompts, llm = [], fake_llm({})
+    monkeypatch.setattr(agent, "llm_json", lambda s, u, schema, **_: prompts.append(u) or llm(s, u, schema))
+    r = agent.Agent().respond(say, alt_text=alt)
+    if fact:
+        assert fact in prompts[-1] and "DEL-5" in r["sources"]
+    else:
+        assert "pincode table" not in prompts[-1] and "pincode 440010 (" not in prompts[-1]
+
+
+def test_verification_pincode_is_not_a_delivery_question(monkeypatch):
+    prompts, llm = [], fake_llm({})
+    monkeypatch.setattr(agent, "llm_json", lambda s, u, schema, **_: prompts.append(u) or llm(s, u, schema))
+    a = agent.Agent()
+    a.respond("Order number hai 1591 1102.")
+    a.respond("Pincode 440010 hai.")  # PC019's proof
+    assert "pincode 440010 (" not in prompts[-1] and a.state.order
+
+
 def test_hindi_voice_caller_keeps_hindi(scripted):
     a = scripted()
     a.state.lang = "hi"  # earlier turn was answered in Hindi
