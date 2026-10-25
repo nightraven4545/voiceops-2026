@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 14:58 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 15:05 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -32,11 +32,11 @@
    - ~~softer abstention on "what if I'm not home?" (PC011/PC012)~~: done 25 Oct as a "second look" (see Checklist history)
 6. **Submission:**
    - make the repo public: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences`
-   - build `<team>_voiceops.zip`. The layout is the brief's p.14 "Submission ZIP structure": `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf`, `demo.mp4`, `sample_outputs/`; no `.env`, keys, venv or dataset copy. From the repo root, after committing everything (git archive takes only committed files; `--add-file` puts a file at the zip root):
-     `git archive --format=zip -9 --add-file=report/report.pdf --add-file=demo.mp4 -o <team>_voiceops.zip HEAD README.md .env.example requirements.txt run.py src sample_outputs`
+   - build `Dstonks_voiceops.zip` (team name: **Dstonks**). The layout is the brief's p.14 "Submission ZIP structure": `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf`, `demo.mp4`, `sample_outputs/`; no `.env`, keys, venv or dataset copy. From the repo root, after committing everything (git archive takes only committed files; `--add-file` puts a file at the zip root):
+     `git archive --format=zip -9 --add-file=report/report.pdf --add-file=demo.mp4 -o Dstonks_voiceops.zip HEAD README.md .env.example requirements.txt run.py src sample_outputs`
    - **Trial run 25 Oct 14:55** (without demo.mp4): 80 files, 10.4 MB. A scan with the real key values found neither key, no key patterns and no forbidden paths. Extracted to a fresh folder, the documented command answered PQ0003 end to end (live LLM, Gnani in and out, valid WAV) in 31 s.
    - The README now has the repository URL and a clone command (the brief requires the public GitHub URL).
-   - still needed: the team name for the file name, `demo.mp4`, the repo made public
+   - still needed: `demo.mp4`, the repo made public
    - put the public repo URL in the submission
 7. **After submission:** rotate the Gnani and Gemini keys; both were pasted in chat.
 
