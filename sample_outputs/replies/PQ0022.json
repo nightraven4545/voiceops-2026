@@ -1,0 +1,68 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0022.wav",
+  "conversation": "",
+  "transcript": "my refund to credit card was started on 17th October 2026 by which date should i have it",
+  "transcript_hi": null,
+  "reply": "Hello, I am ZentroMart's AI support assistant. For a credit card refund initiated on 17 October 2026, you should receive the amount in your account between 24 October 2026 and 27 October 2026.",
+  "decision": "answer",
+  "lang": "en",
+  "sources": [
+    "KB-00.3",
+    "STY-1",
+    "REF-2"
+  ],
+  "retrieved": [
+    {
+      "id": "REF-2",
+      "score": 0.0487,
+      "label": "CURRENT POLICY",
+      "text": "Refunds go back to the original payment method. Timelines are counted in business days from the day the refund is initiated.\n\n| Payment method | Time to reach you |\n| --- | --- |\n| UPI | 1 to 3 business days |\n| Credit or debit card | 5 to 7 business days |\n| Net banking | 3 to 5 business days |\n| ZentroMart Wallet | Instant, within 2 hours |\n| Bank transfer (NEFT) for cash-on-delivery orders | 5 to 7 business days |\n| ZentroMart Wallet for cash-on-delivery orders | Instant, within 2 hours |"
+    },
+    {
+      "id": "KB-00.2",
+      "score": 0.0472,
+      "label": "KB RULES",
+      "text": "All records in this dataset are frozen on **20 October 2026**. Treat this date as \"today\" when you calculate deadlines, delays and refund timelines."
+    },
+    {
+      "id": "DEL-4",
+      "score": 0.0455,
+      "label": "CURRENT POLICY",
+      "text": "If an **Express** order arrives after its promised date, the ₹79 express fee the customer paid is credited to ZentroMart Wallet automatically within 48 hours. ZentroMart Plus members, who pay no express fee, get no credit. There is no compensation for late Standard deliveries. Agents must not offer any other compensation."
+    },
+    {
+      "id": "REF-3",
+      "score": 0.0448,
+      "label": "CURRENT POLICY",
+      "text": "For cash-on-delivery orders, the customer chooses either ZentroMart Wallet (instant) or a bank transfer. Bank transfers start only after the bank account details are verified, then take 5 to 7 business days."
+    },
+    {
+      "id": "KB-00.3",
+      "score": 0.0434,
+      "label": "KB RULES",
+      "text": "A business day is Monday to Saturday, excluding the warehouse holidays below. Refund and logistics timelines are counted in business days. Return windows are counted in calendar days.\n\n| Date | Holiday |\n| --- | --- |\n| 2026-08-15 | Independence Day |\n| 2026-10-02 | Gandhi Jayanti |\n| 2026-10-19 | Warehouse closure (festival) |\n| 2026-11-09 | Warehouse closure (festival) |"
+    },
+    {
+      "id": "RET-7",
+      "score": 0.0405,
+      "label": "CURRENT POLICY",
+      "text": "Returned items go through a quality check (QC) at the warehouse. The refund is initiated within 2 business days of pickup once the item passes QC. For ZentroMart Plus members, the refund is initiated at the time of pickup. Refund timelines after initiation are in the Refunds policy."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "refund timeline for credit card after initiation",
+    "reply_lang": "en",
+    "intent": "check_refund_status",
+    "products": [],
+    "payment_method": "card",
+    "refund_initiated_on": "2026-10-17",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 5.98,
+  "spoken": "Hello, I am ZentroMart's AI support assistant. For a credit card refund initiated on 17 October 2026, you should receive the amount in your account between 24 October 2026 and 27 October 2026.",
+  "reply_audio": "sample_outputs\\replies\\PQ0022.wav"
+}

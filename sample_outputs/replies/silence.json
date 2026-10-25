@@ -1,0 +1,15 @@
+{
+  "file": "sample_outputs\\inputs\\silence.wav",
+  "conversation": "",
+  "transcript": "",
+  "transcript_hi": null,
+  "reply": "Sorry, I didn't catch that. Could you please say it again?",
+  "decision": "clarify",
+  "lang": "en",
+  "sources": [],
+  "retrieved": [],
+  "tool_calls": [],
+  "spoken": "Sorry, I didn't catch that. Could you please say it again?",
+  "reply_audio": "sample_outputs\\replies\\silence.wav",
+  "seconds": 1.53
+}

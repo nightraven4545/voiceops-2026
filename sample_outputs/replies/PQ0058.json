@@ -1,0 +1,72 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0058.wav",
+  "conversation": "",
+  "transcript": "mera order kestral k seven smartphone 256 gigabytes parsu deliver hua kitne din tak return kar sakti hoon",
+  "transcript_hi": "मेरा ऑर्डर कैस्ट्रिल के सेवन स्मार्टफ़ोन 256 गीगाबाइट्स पार्सल डिलीवर हुआ, कितने दिन तक रिटर्न कर सकती हूँ?",
+  "reply": "Hello, main ZentroMart ka AI support assistant hoon. Kestrel K7 smartphone jaise electronics items ke liye return window delivery ke din se 7 days ki hoti hai. Aapka order 18 October 2026 ko deliver hua tha, isliye aap ise 7 days, yaani 25 October 2026 tak return kar sakte hain.",
+  "decision": "answer",
+  "lang": "hi-en",
+  "sources": [
+    "STY-1",
+    "products.csv:ELE-0013",
+    "products.csv:ELE-0014",
+    "RET-2",
+    "RET-3"
+  ],
+  "retrieved": [
+    {
+      "id": "RET-2",
+      "score": 0.0474,
+      "label": "CURRENT POLICY",
+      "text": "The return window starts on the **delivery date** and is counted in calendar days. The category of every product is listed in the `return_category` column of the product catalog.\n\n| Category | Return window | Catalog code |\n| --- | --- | --- |\n| Electronics and accessories | 7 days | `electronics` |\n| Clothing, footwear and bags | 15 days | `fashion` |\n| Home, kitchen and furniture | 10 days | `home_kitchen` |\n| Beauty and personal care (unopened, seal intact) | 7 days | `beauty_sealed` |\n| Books and stationery | 10 days | `books_media` |\n| Grocery, fresh and perishables | Not returnable | `grocery` |\n| Innerwear, lingerie and swimwear | Not returnable | `innerwear` |\n| Gift cards and digital codes | Not returnable | `digital` |"
+    },
+    {
+      "id": "RETv3-2",
+      "score": 0.046,
+      "label": "SUPERSEDED POLICY (applies only where the current policy says so, e.g. RET-3)",
+      "text": "| Category | Return window |\n| --- | --- |\n| Electronics and accessories | 10 days |\n| Clothing, footwear and bags | 15 days |\n| Home, kitchen and furniture | 10 days |\n| Beauty and personal care (unopened) | 7 days |\n| Books and stationery | 10 days |\n| Grocery, innerwear, gift cards | Not returnable |"
+    },
+    {
+      "id": "MKS-2",
+      "score": 0.0447,
+      "label": "CURRENT POLICY",
+      "text": "Return windows, reverse pickup and refunds are the same for every seller and are handled by ZentroMart."
+    },
+    {
+      "id": "RET-8",
+      "score": 0.0425,
+      "label": "CURRENT POLICY",
+      "text": "Clothing, footwear and bags from orders **placed between 01 October and 15 October 2026** can be returned within 30 days of delivery. All other categories follow the normal windows in RET-2."
+    },
+    {
+      "id": "RET-3",
+      "score": 0.0413,
+      "label": "CURRENT POLICY",
+      "text": "From **1 August 2026**, the return window for electronics and accessories is 7 days. Electronics **delivered before 1 August 2026** keep the earlier 10-day window from version 3 of this policy."
+    },
+    {
+      "id": "RETv3-6",
+      "score": 0.0398,
+      "label": "SUPERSEDED POLICY (applies only where the current policy says so, e.g. RET-3)",
+      "text": "Reverse pickup is free for all returns."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "return window duration for electronics",
+    "reply_lang": "hi-en",
+    "intent": "return_inquiry",
+    "products": [
+      "kestral k seven smartphone 256 gigabytes"
+    ],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "2026-10-18",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 8.26,
+  "spoken": "Hello, main ZentroMart ka AI support assistant hoon. Kestrel K7 smartphone jaise electronics items ke liye return window delivery ke din se 7 days ki hoti hai. Aapka order 18 October 2026 ko deliver hua tha, isliye aap ise 7 days, yaani 25 October 2026 tak return kar sakte hain.",
+  "reply_audio": "sample_outputs\\replies\\PQ0058.wav"
+}

@@ -1,0 +1,76 @@
+{
+  "file": "sample_outputs\\inputs\\PC002\\turn4.wav",
+  "conversation": "PC002",
+  "transcript": "monezantro vista 43 inch four k smart tv damage report kiya tha abhi replacement approved car do naa",
+  "transcript_hi": null,
+  "reply": "Main samajh sakta hoon ki aap replacement chahte hain. Maine aapke damaged TV ke liye support ticket raise kar diya hai aur hamari priority resolution team ke ek colleague jald hi aapse contact karenge. Woh is mamle mein aapki aage ki sahayata karenge.",
+  "decision": "escalate",
+  "lang": "hi-en",
+  "sources": [
+    "ESC-1",
+    "products.csv:ELE-0020",
+    "products.csv:ELE-0021",
+    "DWM-3"
+  ],
+  "retrieved": [
+    {
+      "id": "DWM-1",
+      "score": 0.0485,
+      "label": "CURRENT POLICY",
+      "text": "Report a damaged, defective, expired, wrong or missing item within **48 hours of delivery**, with photos of the item and the packaging. This applies to every category, including grocery and other non-returnable items."
+    },
+    {
+      "id": "DWM-2",
+      "score": 0.0482,
+      "label": "CURRENT POLICY",
+      "text": "After verification the customer gets a free replacement or a full refund, including delivery fees. No reverse pickup fee applies."
+    },
+    {
+      "id": "DWM-4",
+      "score": 0.0478,
+      "label": "CURRENT POLICY",
+      "text": "Reports after 48 hours are handled as a normal return if the item is still within its return window. Otherwise the customer can use the brand or ZentroMart Assured warranty, if any."
+    },
+    {
+      "id": "WAR-2",
+      "score": 0.0478,
+      "label": "CURRENT POLICY",
+      "text": "Products marked `assured = true` in the catalog carry a 12-month ZentroMart Assured warranty from the delivery date, in addition to any brand warranty. Claims are raised in the app under My Orders, and ZentroMart arranges pickup and repair or replacement."
+    },
+    {
+      "id": "DWM-3",
+      "score": 0.0469,
+      "label": "CURRENT POLICY",
+      "text": "Claims for items worth more than ₹10,000 are handled by the Priority Resolution team. The support agent must create a ticket and hand over; the agent cannot approve these claims."
+    },
+    {
+      "id": "WAR-3",
+      "score": 0.0463,
+      "label": "CURRENT POLICY",
+      "text": "Physical damage, liquid damage, normal wear and unauthorised repairs are not covered."
+    }
+  ],
+  "tool_calls": [
+    "create_ticket()"
+  ],
+  "ticket_id": "TKTec728d944c74495aaf20206b3352553a",
+  "understand": {
+    "english_query": "replacement approval process for damaged Zentro Vista 43 inch 4K smart TV",
+    "reply_lang": "hi-en",
+    "intent": "request replacement approval",
+    "products": [
+      "Zentro Vista 43 inch 4K smart TV"
+    ],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": [
+      "wants_human",
+      "damage_report"
+    ]
+  },
+  "seconds": 2.74,
+  "spoken": "Main samajh sakta hoon ki aap replacement chahte hain. Maine aapke damaged TV ke liye support ticket raise kar diya hai aur hamari priority resolution team ke ek colleague jald hi aapse contact karenge. Woh is mamle mein aapki aage ki sahayata karenge.",
+  "reply_audio": "sample_outputs\\replies\\PC002\\turn4.wav"
+}

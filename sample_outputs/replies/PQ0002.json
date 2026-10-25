@@ -1,0 +1,68 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0002.wav",
+  "conversation": "",
+  "transcript": "s q le 12 pay zentromart assured hai kya",
+  "transcript_hi": "एस क्यू एल ई 12 पे ज़ेंट्रोमाट अश्योर्ड है क्या, क्लेम कैसे करें?",
+  "reply": "Namaste, main ZentroMart ki AI support assistant hoon. Maaf kijiye, mere paas iski jaankari nahi hai. Aap chahein toh main aapko hamare colleague se connect kar sakti hoon.",
+  "decision": "answer",
+  "lang": "hi-en",
+  "sources": [
+    "STY-1"
+  ],
+  "retrieved": [
+    {
+      "id": "WAR-2",
+      "score": 0.05,
+      "label": "CURRENT POLICY",
+      "text": "Products marked `assured = true` in the catalog carry a 12-month ZentroMart Assured warranty from the delivery date, in addition to any brand warranty. Claims are raised in the app under My Orders, and ZentroMart arranges pickup and repair or replacement."
+    },
+    {
+      "id": "MKS-3",
+      "score": 0.0487,
+      "label": "CURRENT POLICY",
+      "text": "ZentroMart Assured never applies to marketplace seller items, even if the listing says assured. Seller items carry only the brand warranty."
+    },
+    {
+      "id": "WAR-3",
+      "score": 0.0478,
+      "label": "CURRENT POLICY",
+      "text": "Physical damage, liquid damage, normal wear and unauthorised repairs are not covered."
+    },
+    {
+      "id": "WAR-1",
+      "score": 0.0472,
+      "label": "CURRENT POLICY",
+      "text": "Most electronics come with the manufacturer's warranty. The warranty period is listed in the `warranty_months` column of the product catalog. Brand warranty claims are made with the manufacturer's service centre."
+    },
+    {
+      "id": "DWM-4",
+      "score": 0.0461,
+      "label": "CURRENT POLICY",
+      "text": "Reports after 48 hours are handled as a normal return if the item is still within its return window. Otherwise the customer can use the brand or ZentroMart Assured warranty, if any."
+    },
+    {
+      "id": "DEL-4",
+      "score": 0.0441,
+      "label": "CURRENT POLICY",
+      "text": "If an **Express** order arrives after its promised date, the ₹79 express fee the customer paid is credited to ZentroMart Wallet automatically within 48 hours. ZentroMart Plus members, who pay no express fee, get no credit. There is no compensation for late Standard deliveries. Agents must not offer any other compensation."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "is SQL 12 ZentroMart assured and how to file a claim",
+    "reply_lang": "hi-en",
+    "intent": "inquiry_about_assured_status_and_claim_process",
+    "products": [
+      "SQL 12"
+    ],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 22.74,
+  "spoken": "Namaste, main ZentroMart ki AI support assistant hoon. Maaf kijiye, mere paas iski jaankari nahi hai. Aap chahein toh main aapko hamare colleague se connect kar sakti hoon.",
+  "reply_audio": "sample_outputs\\replies\\PQ0002.wav"
+}

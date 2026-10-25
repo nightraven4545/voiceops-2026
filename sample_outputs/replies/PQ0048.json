@@ -1,0 +1,70 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0048.wav",
+  "conversation": "",
+  "transcript": "mera saman tuta hua aaya hai ab kya karun",
+  "transcript_hi": "मेरा सामान टूटा हुआ आया है, अब क्या करूँ?",
+  "reply": "Main ZentroMart ka AI assistant hoon. Agar aapka saman tuta hua aaya hai, toh aapko ise delivery ke 48 hours ke andar report karna hoga. Iske liye aapko saman aur uski packaging ki photo bhejni hogi. Kya aap mujhe apna Order ID bata sakte hain taaki main iska process shuru karne mein aapki madad kar sakun?",
+  "decision": "clarify",
+  "lang": "hi-en",
+  "sources": [
+    "STY-1",
+    "DWM-1",
+    "DWM-2"
+  ],
+  "retrieved": [
+    {
+      "id": "DWM-2",
+      "score": 0.041,
+      "label": "CURRENT POLICY",
+      "text": "After verification the customer gets a free replacement or a full refund, including delivery fees. No reverse pickup fee applies."
+    },
+    {
+      "id": "DWM-1",
+      "score": 0.0398,
+      "label": "CURRENT POLICY",
+      "text": "Report a damaged, defective, expired, wrong or missing item within **48 hours of delivery**, with photos of the item and the packaging. This applies to every category, including grocery and other non-returnable items."
+    },
+    {
+      "id": "RET-4",
+      "score": 0.0396,
+      "label": "CURRENT POLICY",
+      "text": "Items must be unused, with original tags, packaging, accessories and free gifts. Beauty and personal care products are returnable only if unopened with the seal intact. Electronics must not be physically damaged, and any screen lock or account lock must be removed."
+    },
+    {
+      "id": "RET-5",
+      "score": 0.0393,
+      "label": "CURRENT POLICY",
+      "text": "Grocery and fresh produce, innerwear, lingerie and swimwear, and gift cards or digital codes cannot be returned for change of mind. If such an item arrives damaged, expired, wrong or missing, follow the Damaged, wrong or missing items policy."
+    },
+    {
+      "id": "RET-2",
+      "score": 0.0381,
+      "label": "CURRENT POLICY",
+      "text": "The return window starts on the **delivery date** and is counted in calendar days. The category of every product is listed in the `return_category` column of the product catalog.\n\n| Category | Return window | Catalog code |\n| --- | --- | --- |\n| Electronics and accessories | 7 days | `electronics` |\n| Clothing, footwear and bags | 15 days | `fashion` |\n| Home, kitchen and furniture | 10 days | `home_kitchen` |\n| Beauty and personal care (unopened, seal intact) | 7 days | `beauty_sealed` |\n| Books and stationery | 10 days | `books_media` |\n| Grocery, fresh and perishables | Not returnable | `grocery` |\n| Innerwear, lingerie and swimwear | Not returnable | `innerwear` |\n| Gift cards and digital codes | Not returnable | `digital` |"
+    },
+    {
+      "id": "DWM-4",
+      "score": 0.0379,
+      "label": "CURRENT POLICY",
+      "text": "Reports after 48 hours are handled as a normal return if the item is still within its return window. Otherwise the customer can use the brand or ZentroMart Assured warranty, if any."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "return or replacement process for damaged product received",
+    "reply_lang": "hi-en",
+    "intent": "report_damage",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": [
+      "damage_report"
+    ]
+  },
+  "seconds": 6.6,
+  "spoken": "Main ZentroMart ka AI assistant hoon. Agar aapka saman tuta hua aaya hai, toh aapko ise delivery ke 48 hours ke andar report karna hoga. Iske liye aapko saman aur uski packaging ki photo bhejni hogi. Kya aap mujhe apna Order ID bata sakte hain taaki main iska process shuru karne mein aapki madad kar sakun?",
+  "reply_audio": "sample_outputs\\replies\\PQ0048.wav"
+}

@@ -1,0 +1,70 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0014.wav",
+  "conversation": "",
+  "transcript": "mujhe parkscraft a five ruled notebook pack of chaar lautane ke liye kitne din milenge",
+  "transcript_hi": "मुझे पाक्चक्राफ्ट ए फाइव रूल्ड नोटबुक पैक ऑफ़ 4 लौटाने के लिए कितने दिन मिलेंगे",
+  "reply": "Namaste, main ZentroMart ka AI support assistant hoon. Pagecraft A5 Ruled Notebook (Pack of 4) ke liye aapko 10 days ka return window milta hai.",
+  "decision": "answer",
+  "lang": "hi-en",
+  "sources": [
+    "STY-1",
+    "products.csv:BKS-0056",
+    "RET-2"
+  ],
+  "retrieved": [
+    {
+      "id": "RVP-1",
+      "score": 0.0406,
+      "label": "HELP ARTICLE",
+      "text": "Raise the return from My Orders. Choose a pickup slot. The delivery executive will check the item at the door against the condition rules in RET-4."
+    },
+    {
+      "id": "RET-2",
+      "score": 0.0397,
+      "label": "CURRENT POLICY",
+      "text": "The return window starts on the **delivery date** and is counted in calendar days. The category of every product is listed in the `return_category` column of the product catalog.\n\n| Category | Return window | Catalog code |\n| --- | --- | --- |\n| Electronics and accessories | 7 days | `electronics` |\n| Clothing, footwear and bags | 15 days | `fashion` |\n| Home, kitchen and furniture | 10 days | `home_kitchen` |\n| Beauty and personal care (unopened, seal intact) | 7 days | `beauty_sealed` |\n| Books and stationery | 10 days | `books_media` |\n| Grocery, fresh and perishables | Not returnable | `grocery` |\n| Innerwear, lingerie and swimwear | Not returnable | `innerwear` |\n| Gift cards and digital codes | Not returnable | `digital` |"
+    },
+    {
+      "id": "RETv3-2",
+      "score": 0.0394,
+      "label": "SUPERSEDED POLICY (applies only where the current policy says so, e.g. RET-3)",
+      "text": "| Category | Return window |\n| --- | --- |\n| Electronics and accessories | 10 days |\n| Clothing, footwear and bags | 15 days |\n| Home, kitchen and furniture | 10 days |\n| Beauty and personal care (unopened) | 7 days |\n| Books and stationery | 10 days |\n| Grocery, innerwear, gift cards | Not returnable |"
+    },
+    {
+      "id": "TRK-1",
+      "score": 0.039,
+      "label": "HELP ARTICLE",
+      "text": "| Status shown | What it means |\n| --- | --- |\n| Placed | Payment confirmed, waiting to be packed |\n| Packed | Packed at the warehouse, waiting for courier pickup |\n| Shipped | With the courier, on the way |\n| Out for delivery | With the delivery executive today |\n| Delivery attempted | The courier could not deliver; see DEL-3 |\n| Delivered | Handed over at the address |\n| Returned to origin (RTO) | Could not be delivered and is going back to the warehouse; prepaid refunds follow REF-1 |\n| Cancelled | Cancelled before shipping |"
+    },
+    {
+      "id": "MKS-2",
+      "score": 0.0372,
+      "label": "CURRENT POLICY",
+      "text": "Return windows, reverse pickup and refunds are the same for every seller and are handled by ZentroMart."
+    },
+    {
+      "id": "RET-3",
+      "score": 0.0318,
+      "label": "CURRENT POLICY",
+      "text": "From **1 August 2026**, the return window for electronics and accessories is 7 days. Electronics **delivered before 1 August 2026** keep the earlier 10-day window from version 3 of this policy."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "return window for Parkscraft A5 ruled notebook pack of 4",
+    "reply_lang": "hi-en",
+    "intent": "return_policy_query",
+    "products": [
+      "Parkscraft A5 ruled notebook pack of 4"
+    ],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 6.59,
+  "spoken": "Namaste, main ZentroMart ka AI support assistant hoon. Pagecraft A5 Ruled Notebook (Pack of 4) ke liye aapko 10 days ka return window milta hai.",
+  "reply_audio": "sample_outputs\\replies\\PQ0014.wav"
+}

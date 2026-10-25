@@ -36,7 +36,8 @@ Submission:
 | Rule + agent tests | 44 passing (`python -m pytest tests`) |
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
 | Voice end to end | 17/17 files processed, batch never stops; Hindi digits verified live (PC021). Hindi-language fix verified on turn 2; turns 3–4 hit the daily quota on the retest |
-| Report | `report/report.md` complete, ~2.5 pages, every number checked against the CSVs; needs PDF export |
+| Report | `report/report.md` → `report/report.pdf` (3 pages, A4). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
+| Sample outputs | `sample_outputs/`: 13 files (8 questions, PC002 conversation, silence), replayed from cached LLM answers with live calls blocked; 0 errors. PC021 to be added after a live rerun |
 | Git | **Private** repo https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
 
 ## Results (practice set, `eval/results/<model>/`)
@@ -80,10 +81,13 @@ Remaining failures:
 - [x] Refill missing 3.1 rows: all complete.
 - [x] Report: every number taken from the CSVs; 3.5 vs 3.1 comparison included.
 - [x] Voice: a Hindi caller stays in Hindi when reading out digits (`State.lang`). Verified live on PC021 turn 2.
-- [ ] After the quota reset (12:30 IST): rerun PC021 by voice to confirm turns 3–4 in Hindi.
+- [ ] After the quota reset (12:30 IST): rerun PC021 by voice to confirm turns 3–4 in Hindi, then add it to `sample_outputs/`:
+  1. copy `test_audio/PC021` to `sample_outputs/inputs/`
+  2. rerun `run.py` into `sample_outputs/replies`
+  3. add a row to `sample_outputs/README.md`
 - [ ] Optional quality fix: a post-check that every "must state" computed fact (refund timing, RRN) appears in the reply.
-- [ ] `sample_outputs/` from a clean `run.py` run (no `.env`, no dataset copy).
-- [ ] report.pdf (≤4 pp).
+- [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
+- [x] report.pdf (3 pages).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.
 - [ ] Fresh-clone check: follow the README exactly in a temp folder.
 - [x] Create the private GitHub repo and push (25 Oct). This also lets Claude Code cloud sessions run on the $100 credit.

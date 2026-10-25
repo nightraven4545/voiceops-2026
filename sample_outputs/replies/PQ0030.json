@@ -1,0 +1,78 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0030.wav",
+  "conversation": "",
+  "transcript": "the kestrel book 14 laptop s k u e le 23 i received yesterday has a crack i want it sorted",
+  "transcript_hi": null,
+  "reply": "I am ZentroMart's AI support assistant. I am sorry to hear that your Kestrel Book 14 laptop (ELE-0023) arrived with a crack. I have raised a support ticket for this issue, and a human colleague will review it and contact you soon.",
+  "decision": "escalate",
+  "lang": "en",
+  "sources": [
+    "ESC-1",
+    "STY-1",
+    "products.csv:ELE-0022",
+    "products.csv:ELE-0023",
+    "DWM-1",
+    "DWM-2"
+  ],
+  "retrieved": [
+    {
+      "id": "RETv3-2",
+      "score": 0.0424,
+      "label": "SUPERSEDED POLICY (applies only where the current policy says so, e.g. RET-3)",
+      "text": "| Category | Return window |\n| --- | --- |\n| Electronics and accessories | 10 days |\n| Clothing, footwear and bags | 15 days |\n| Home, kitchen and furniture | 10 days |\n| Beauty and personal care (unopened) | 7 days |\n| Books and stationery | 10 days |\n| Grocery, innerwear, gift cards | Not returnable |"
+    },
+    {
+      "id": "DWM-1",
+      "score": 0.0392,
+      "label": "CURRENT POLICY",
+      "text": "Report a damaged, defective, expired, wrong or missing item within **48 hours of delivery**, with photos of the item and the packaging. This applies to every category, including grocery and other non-returnable items."
+    },
+    {
+      "id": "DWM-4",
+      "score": 0.0388,
+      "label": "CURRENT POLICY",
+      "text": "Reports after 48 hours are handled as a normal return if the item is still within its return window. Otherwise the customer can use the brand or ZentroMart Assured warranty, if any."
+    },
+    {
+      "id": "RET-3",
+      "score": 0.0366,
+      "label": "CURRENT POLICY",
+      "text": "From **1 August 2026**, the return window for electronics and accessories is 7 days. Electronics **delivered before 1 August 2026** keep the earlier 10-day window from version 3 of this policy."
+    },
+    {
+      "id": "DWM-2",
+      "score": 0.0325,
+      "label": "CURRENT POLICY",
+      "text": "After verification the customer gets a free replacement or a full refund, including delivery fees. No reverse pickup fee applies."
+    },
+    {
+      "id": "TRK-2",
+      "score": 0.0325,
+      "label": "HELP ARTICLE",
+      "text": "If an order shows Delivered but the customer has not received it, check with family, neighbours or the building security, then report it within 48 hours as a missing item under DWM-1."
+    }
+  ],
+  "tool_calls": [
+    "create_ticket()"
+  ],
+  "ticket_id": "TKT878a6795414a4fc4b51d89b31a02048f",
+  "understand": {
+    "english_query": "return or replacement policy for damaged laptop received with a crack",
+    "reply_lang": "en",
+    "intent": "return_or_exchange",
+    "products": [
+      "kestrel book 14 laptop",
+      "e le 23"
+    ],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "2026-10-19",
+    "ordered_on": "",
+    "flags": [
+      "damage_report"
+    ]
+  },
+  "seconds": 5.06,
+  "spoken": "I am ZentroMart's AI support assistant. I am sorry to hear that your Kestrel Book 14 laptop (ELE-0023) arrived with a crack. I have raised a support ticket for this issue, and a human colleague will review it and contact you soon.",
+  "reply_audio": "sample_outputs\\replies\\PQ0030.wav"
+}

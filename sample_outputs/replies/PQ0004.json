@@ -1,0 +1,67 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0004.wav",
+  "conversation": "",
+  "transcript": "can i schedule a delivery at midnight",
+  "transcript_hi": null,
+  "reply": "Hi, I'm ZentroMart's AI support assistant. I'm sorry, I don't have information about that in ZentroMart's policies. I can connect you to a human colleague if you'd like.",
+  "decision": "answer",
+  "lang": "en",
+  "sources": [
+    "STY-1",
+    "DEL-1"
+  ],
+  "retrieved": [
+    {
+      "id": "DEL-1",
+      "score": 0.0477,
+      "label": "CURRENT POLICY",
+      "text": "| Delivery type | Metro cities | Other locations |\n| --- | --- | --- |\n| Standard | 3 to 6 business days | 5 to 9 business days |\n| Express (selected pincodes) | Next business day if ordered before 2 pm, otherwise the business day after | Not available |\n\nEach order shows a promised delivery date at checkout. That date is the commitment."
+    },
+    {
+      "id": "DEL-6",
+      "score": 0.0469,
+      "label": "CURRENT POLICY",
+      "text": "The delivery address can be changed before the order ships. After shipping, the address cannot be changed."
+    },
+    {
+      "id": "FAQ-3",
+      "score": 0.0466,
+      "label": "FAQ (lower authority than policy)",
+      "text": "Delivery is free on most orders."
+    },
+    {
+      "id": "DEL-4",
+      "score": 0.0455,
+      "label": "CURRENT POLICY",
+      "text": "If an **Express** order arrives after its promised date, the ₹79 express fee the customer paid is credited to ZentroMart Wallet automatically within 48 hours. ZentroMart Plus members, who pay no express fee, get no credit. There is no compensation for late Standard deliveries. Agents must not offer any other compensation."
+    },
+    {
+      "id": "REF-5",
+      "score": 0.0453,
+      "label": "CURRENT POLICY",
+      "text": "Delivery fees and the ₹25 cash-on-delivery fee are refunded only when the whole order is cancelled before shipping or returned because it was damaged, defective or wrong."
+    },
+    {
+      "id": "CAN-3",
+      "score": 0.0453,
+      "label": "CURRENT POLICY",
+      "text": "Grocery orders can be cancelled up to 2 hours before the start of the chosen delivery slot.\nIf the slot start time is not in the order record, ask the customer for the time shown in My Orders before confirming whether the cutoff has passed."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "can I schedule a delivery at midnight",
+    "reply_lang": "en",
+    "intent": "delivery_scheduling_inquiry",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 4.33,
+  "spoken": "Hi, I'm ZentroMart's AI support assistant. I'm sorry, I don't have information about that in ZentroMart's policies. I can connect you to a human colleague if you'd like.",
+  "reply_audio": "sample_outputs\\replies\\PQ0004.wav"
+}

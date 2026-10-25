@@ -1,0 +1,67 @@
+{
+  "file": "sample_outputs\\inputs\\PQ0003.wav",
+  "conversation": "",
+  "transcript": "how fast are refunds to the zentromart wallet",
+  "transcript_hi": null,
+  "reply": "Hello, I am ZentroMart's AI support assistant. Refunds to your ZentroMart Wallet are processed instantly and will arrive within 2 hours of initiation.",
+  "decision": "answer",
+  "lang": "en",
+  "sources": [
+    "STY-1",
+    "REF-2"
+  ],
+  "retrieved": [
+    {
+      "id": "REF-2",
+      "score": 0.0489,
+      "label": "CURRENT POLICY",
+      "text": "Refunds go back to the original payment method. Timelines are counted in business days from the day the refund is initiated.\n\n| Payment method | Time to reach you |\n| --- | --- |\n| UPI | 1 to 3 business days |\n| Credit or debit card | 5 to 7 business days |\n| Net banking | 3 to 5 business days |\n| ZentroMart Wallet | Instant, within 2 hours |\n| Bank transfer (NEFT) for cash-on-delivery orders | 5 to 7 business days |\n| ZentroMart Wallet for cash-on-delivery orders | Instant, within 2 hours |"
+    },
+    {
+      "id": "REF-3",
+      "score": 0.0488,
+      "label": "CURRENT POLICY",
+      "text": "For cash-on-delivery orders, the customer chooses either ZentroMart Wallet (instant) or a bank transfer. Bank transfers start only after the bank account details are verified, then take 5 to 7 business days."
+    },
+    {
+      "id": "PAY-4",
+      "score": 0.0481,
+      "label": "CURRENT POLICY",
+      "text": "ZentroMart Wallet balance can be used on any order and never expires. It cannot be transferred to a bank account. For cash-on-delivery refunds, the customer chooses Wallet or bank transfer before the refund is made (REF-3); once refunded to the Wallet, it stays there."
+    },
+    {
+      "id": "RET-7",
+      "score": 0.0474,
+      "label": "CURRENT POLICY",
+      "text": "Returned items go through a quality check (QC) at the warehouse. The refund is initiated within 2 business days of pickup once the item passes QC. For ZentroMart Plus members, the refund is initiated at the time of pickup. Refund timelines after initiation are in the Refunds policy."
+    },
+    {
+      "id": "DEL-4",
+      "score": 0.0464,
+      "label": "CURRENT POLICY",
+      "text": "If an **Express** order arrives after its promised date, the ₹79 express fee the customer paid is credited to ZentroMart Wallet automatically within 48 hours. ZentroMart Plus members, who pay no express fee, get no credit. There is no compensation for late Standard deliveries. Agents must not offer any other compensation."
+    },
+    {
+      "id": "REF-1",
+      "score": 0.0441,
+      "label": "CURRENT POLICY",
+      "text": "- **Cancelled before shipping:** immediately on cancellation.\n- **Returned item:** after the item passes quality check, within 2 business days of pickup. ZentroMart Plus members: at pickup.\n- **Prepaid order refused at the door or not delivered after 3 attempts:** once the parcel reaches the warehouse, usually 7 to 10 calendar days after the last delivery attempt."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "refund processing time for ZentroMart wallet",
+    "reply_lang": "en",
+    "intent": "refund_timeline_inquiry",
+    "products": [],
+    "payment_method": "wallet",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 4.47,
+  "spoken": "Hello, I am ZentroMart's AI support assistant. Refunds to your ZentroMart Wallet are processed instantly and will arrive within 2 hours of initiation.",
+  "reply_audio": "sample_outputs\\replies\\PQ0003.wav"
+}

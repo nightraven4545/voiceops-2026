@@ -1,0 +1,68 @@
+{
+  "file": "sample_outputs\\inputs\\PC002\\turn1.wav",
+  "conversation": "PC002",
+  "transcript": "hello mujhe order ke baare mein help chaahiye",
+  "transcript_hi": "हेलो, मुझे ऑर्डर के बारे में हेल्प चाहिए।",
+  "reply": "Hello, main ZentroMart ka AI support assistant hoon. Aapke order ke baare mein madad karne ke liye, kya aap mujhe apna order ID bata sakte hain?",
+  "decision": "clarify",
+  "lang": "hi-en",
+  "sources": [
+    "STY-1",
+    "IDV-1",
+    "IDV-2"
+  ],
+  "retrieved": [
+    {
+      "id": "IDV-3",
+      "score": 0.0492,
+      "label": "AGENT GUIDE",
+      "text": "Allow one retry. If it fails again, do not share order details. Offer general policy help and suggest the customer contact support from the registered phone number."
+    },
+    {
+      "id": "CAN-1",
+      "score": 0.0484,
+      "label": "CURRENT POLICY",
+      "text": "Any order can be cancelled free of charge until it is shipped, by the customer from My Orders in the app. The support assistant cannot cancel orders itself; it guides the customer to My Orders. The refund is initiated immediately."
+    },
+    {
+      "id": "IDV-2",
+      "score": 0.0461,
+      "label": "AGENT GUIDE",
+      "text": "Ask for the order ID, then ask for **one** of: the last 4 digits of the registered phone number, or the delivery pincode for that order. Compare with the `phone_last4` or `delivery_pincode` fields from order lookup."
+    },
+    {
+      "id": "IDV-1",
+      "score": 0.0394,
+      "label": "AGENT GUIDE",
+      "text": "Before sharing anything about a specific order (status, items, address, amounts, refund details), verify the customer. General policy questions need no verification."
+    },
+    {
+      "id": "MKS-1",
+      "score": 0.039,
+      "label": "CURRENT POLICY",
+      "text": "Each product in the catalog has a `fulfilled_by` field. Items are either fulfilled by ZentroMart or by an independent marketplace seller."
+    },
+    {
+      "id": "STY-1",
+      "score": 0.0383,
+      "label": "AGENT GUIDE",
+      "text": "Introduce yourself as ZentroMart's AI support assistant in your first reply."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "general support for order",
+    "reply_lang": "hi-en",
+    "intent": "general_order_inquiry",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 4.6,
+  "spoken": "Hello, main ZentroMart ka AI support assistant hoon. Aapke order ke baare mein madad karne ke liye, kya aap mujhe apna order ID bata sakte hain?",
+  "reply_audio": "sample_outputs\\replies\\PC002\\turn1.wav"
+}

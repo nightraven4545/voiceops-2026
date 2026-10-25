@@ -1,0 +1,69 @@
+{
+  "file": "sample_outputs\\inputs\\PC002\\turn2.wav",
+  "conversation": "PC002",
+  "transcript": "order number hai 89782837",
+  "transcript_hi": "ऑर्डर नंबर है 89782837",
+  "reply": "Shukriya. Order details check karne ke liye, kripya ya toh apne registered mobile number ke last 4 digits batayein ya phir is order ka delivery pincode share karein.",
+  "decision": "clarify",
+  "lang": "hi-en",
+  "sources": [
+    "IDV-2",
+    "IDV-1"
+  ],
+  "retrieved": [
+    {
+      "id": "IDV-2",
+      "score": 0.0474,
+      "label": "AGENT GUIDE",
+      "text": "Ask for the order ID, then ask for **one** of: the last 4 digits of the registered phone number, or the delivery pincode for that order. Compare with the `phone_last4` or `delivery_pincode` fields from order lookup."
+    },
+    {
+      "id": "TRK-1",
+      "score": 0.0461,
+      "label": "HELP ARTICLE",
+      "text": "| Status shown | What it means |\n| --- | --- |\n| Placed | Payment confirmed, waiting to be packed |\n| Packed | Packed at the warehouse, waiting for courier pickup |\n| Shipped | With the courier, on the way |\n| Out for delivery | With the delivery executive today |\n| Delivery attempted | The courier could not deliver; see DEL-3 |\n| Delivered | Handed over at the address |\n| Returned to origin (RTO) | Could not be delivered and is going back to the warehouse; prepaid refunds follow REF-1 |\n| Cancelled | Cancelled before shipping |"
+    },
+    {
+      "id": "CAN-3",
+      "score": 0.0451,
+      "label": "CURRENT POLICY",
+      "text": "Grocery orders can be cancelled up to 2 hours before the start of the chosen delivery slot.\nIf the slot start time is not in the order record, ask the customer for the time shown in My Orders before confirming whether the cutoff has passed."
+    },
+    {
+      "id": "CAN-1",
+      "score": 0.0451,
+      "label": "CURRENT POLICY",
+      "text": "Any order can be cancelled free of charge until it is shipped, by the customer from My Orders in the app. The support assistant cannot cancel orders itself; it guides the customer to My Orders. The refund is initiated immediately."
+    },
+    {
+      "id": "CAN-4",
+      "score": 0.0419,
+      "label": "CURRENT POLICY",
+      "text": "Individual items in a multi-item order can be cancelled before they ship. Coupon rules in REF-4 apply."
+    },
+    {
+      "id": "IDV-1",
+      "score": 0.0395,
+      "label": "AGENT GUIDE",
+      "text": "Before sharing anything about a specific order (status, items, address, amounts, refund details), verify the customer. General policy questions need no verification."
+    }
+  ],
+  "tool_calls": [
+    "lookup_order(order_id=89782837)"
+  ],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "status of order",
+    "reply_lang": "hi-en",
+    "intent": "check_order_status",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 2.76,
+  "spoken": "Shukriya. Order details check karne ke liye, kripya ya toh apne registered mobile number ke last 4 digits batayein ya phir is order ka delivery pincode share karein.",
+  "reply_audio": "sample_outputs\\replies\\PC002\\turn2.wav"
+}

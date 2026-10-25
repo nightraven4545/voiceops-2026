@@ -1,0 +1,69 @@
+{
+  "file": "sample_outputs\\inputs\\PC002\\turn3.wav",
+  "conversation": "PC002",
+  "transcript": "last four digits 4,533 hai",
+  "transcript_hi": "लास्ट फोर डिजिट्स 4,533 हैं",
+  "reply": "Shukriya verification ke liye. Aapke order 89782837 mein Zentro Vista TV damaged report kiya gaya hai, isliye main ek colleague ko connect kar raha hoon jo is priority matter mein aapki madad karenge.",
+  "decision": "answer",
+  "lang": "hi-en",
+  "sources": [
+    "IDV-2",
+    "ESC-1"
+  ],
+  "retrieved": [
+    {
+      "id": "IDV-2",
+      "score": 0.0499,
+      "label": "AGENT GUIDE",
+      "text": "Ask for the order ID, then ask for **one** of: the last 4 digits of the registered phone number, or the delivery pincode for that order. Compare with the `phone_last4` or `delivery_pincode` fields from order lookup."
+    },
+    {
+      "id": "STY-3",
+      "score": 0.0485,
+      "label": "AGENT GUIDE",
+      "text": "When replying by voice, keep it to two or three short sentences. Say dates with the month name (\"the 24th of October\"), read order IDs in groups of four digits, and say amounts in rupees (\"forty-nine rupees\")."
+    },
+    {
+      "id": "RET-2",
+      "score": 0.0458,
+      "label": "CURRENT POLICY",
+      "text": "The return window starts on the **delivery date** and is counted in calendar days. The category of every product is listed in the `return_category` column of the product catalog.\n\n| Category | Return window | Catalog code |\n| --- | --- | --- |\n| Electronics and accessories | 7 days | `electronics` |\n| Clothing, footwear and bags | 15 days | `fashion` |\n| Home, kitchen and furniture | 10 days | `home_kitchen` |\n| Beauty and personal care (unopened, seal intact) | 7 days | `beauty_sealed` |\n| Books and stationery | 10 days | `books_media` |\n| Grocery, fresh and perishables | Not returnable | `grocery` |\n| Innerwear, lingerie and swimwear | Not returnable | `innerwear` |\n| Gift cards and digital codes | Not returnable | `digital` |"
+    },
+    {
+      "id": "ESC-1",
+      "score": 0.0443,
+      "label": "AGENT GUIDE",
+      "text": "Hand over at once when any of these is true:\n\n1. **Damaged, defective or wrong item worth more than ₹10,000.**\n2. **Customer reports an order, payment or account activity they did not make.**\n3. **Customer mentions legal action, a consumer court or a police complaint.**\n4. **Third or later contact about the same issue within 7 days.**\n5. **Refund more than 3 business days past its maximum timeline.**\n6. **Customer asks for a human agent.**\n7. **Product safety risk such as a swelling battery, burning smell, sparks or injury.**\n\nFor the repeat-contact rule, use the `contacts_last_7_days` field returned by order lookup. It counts earlier contacts only, not the current one. Escalate when it is 2 or more."
+    },
+    {
+      "id": "IDV-4",
+      "score": 0.0393,
+      "label": "AGENT GUIDE",
+      "text": "Never read out the full phone number, email or street address, even to a verified customer."
+    },
+    {
+      "id": "REF-1",
+      "score": 0.0359,
+      "label": "CURRENT POLICY",
+      "text": "- **Cancelled before shipping:** immediately on cancellation.\n- **Returned item:** after the item passes quality check, within 2 business days of pickup. ZentroMart Plus members: at pickup.\n- **Prepaid order refused at the door or not delivered after 3 attempts:** once the parcel reaches the warehouse, usually 7 to 10 calendar days after the last delivery attempt."
+    }
+  ],
+  "tool_calls": [
+    "lookup_order(order_id=89782837, verification_value=4533)"
+  ],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "customer authentication with last four digits of mobile number",
+    "reply_lang": "hi-en",
+    "intent": "authenticate_user",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 3.4,
+  "spoken": "Shukriya verification ke liye. Aapke order 8978 2837 mein Zentro Vista TV damaged report kiya gaya hai, isliye main ek colleague ko connect kar raha hoon jo is priority matter mein aapki madad karenge.",
+  "reply_audio": "sample_outputs\\replies\\PC002\\turn3.wav"
+}
