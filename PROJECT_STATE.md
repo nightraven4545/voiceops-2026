@@ -190,7 +190,7 @@ Rules:
 - ponytail (minimal code)
 - every fix must be general, never question-specific
 - after each milestone, update PROJECT_STATE.md and commit + push
-- ask me before anything outward-facing or irreversible: making the repo public, deleting anything outside the repo except %USERPROFILE%\vofresh, spending money, messaging anyone
+- ask me before anything outward-facing or irreversible: making the repo public, deleting anything outside the repo, spending money, messaging anyone
 ```
 
 ## Gotchas (each cost time once)
