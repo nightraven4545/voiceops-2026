@@ -55,7 +55,7 @@
   "tool_calls": [
     "create_ticket()"
   ],
-  "ticket_id": "TKT878a6795414a4fc4b51d89b31a02048f",
+  "ticket_id": "TKT2eeedbc952ce456bab4fc0325c7db3b8",
   "understand": {
     "english_query": "return or replacement policy for damaged laptop received with a crack",
     "reply_lang": "en",
@@ -72,7 +72,7 @@
       "damage_report"
     ]
   },
-  "seconds": 5.06,
+  "seconds": 2.2,
   "spoken": "I am ZentroMart's AI support assistant. I am sorry to hear that your Kestrel Book 14 laptop (ELE-0023) arrived with a crack. I have raised a support ticket for this issue, and a human colleague will review it and contact you soon.",
   "reply_audio": "sample_outputs\\replies\\PQ0030.wav"
 }

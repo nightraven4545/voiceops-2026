@@ -1,0 +1,69 @@
+{
+  "file": "sample_outputs\\inputs\\PC021\\turn4.wav",
+  "conversation": "PC021",
+  "transcript": "aakhiri chaar ank ek hazaar do sau chhiyasath hai",
+  "transcript_hi": "आखिरी 4 अंक 1,266 हैं",
+  "reply": "क्षमा करें, आपके द्वारा दी गई जानकारी फिर से मेल नहीं खा रही है। सुरक्षा कारणों से मैं इस ऑर्डर की जानकारी साझा नहीं कर पाऊंगा। कृपया अपने रजिस्टर्ड मोबाइल नंबर से दोबारा संपर्क करें।",
+  "decision": "refuse",
+  "lang": "hi",
+  "sources": [
+    "IDV-2",
+    "IDV-3"
+  ],
+  "retrieved": [
+    {
+      "id": "RVP-3",
+      "score": 0.036,
+      "label": "HELP ARTICLE",
+      "text": "If the item fails the doorstep check, the executive will not collect it, and the customer gets an SMS with the reason."
+    },
+    {
+      "id": "PAY-3",
+      "score": 0.0359,
+      "label": "CURRENT POLICY",
+      "text": "If money was deducted but the order was not placed, the amount is reversed automatically by the payment provider within 5 business days. No ticket is needed before that."
+    },
+    {
+      "id": "RET-2",
+      "score": 0.0355,
+      "label": "CURRENT POLICY",
+      "text": "The return window starts on the **delivery date** and is counted in calendar days. The category of every product is listed in the `return_category` column of the product catalog.\n\n| Category | Return window | Catalog code |\n| --- | --- | --- |\n| Electronics and accessories | 7 days | `electronics` |\n| Clothing, footwear and bags | 15 days | `fashion` |\n| Home, kitchen and furniture | 10 days | `home_kitchen` |\n| Beauty and personal care (unopened, seal intact) | 7 days | `beauty_sealed` |\n| Books and stationery | 10 days | `books_media` |\n| Grocery, fresh and perishables | Not returnable | `grocery` |\n| Innerwear, lingerie and swimwear | Not returnable | `innerwear` |\n| Gift cards and digital codes | Not returnable | `digital` |"
+    },
+    {
+      "id": "IDV-3",
+      "score": 0.0331,
+      "label": "AGENT GUIDE",
+      "text": "Allow one retry. If it fails again, do not share order details. Offer general policy help and suggest the customer contact support from the registered phone number."
+    },
+    {
+      "id": "IDV-2",
+      "score": 0.0331,
+      "label": "AGENT GUIDE",
+      "text": "Ask for the order ID, then ask for **one** of: the last 4 digits of the registered phone number, or the delivery pincode for that order. Compare with the `phone_last4` or `delivery_pincode` fields from order lookup."
+    },
+    {
+      "id": "IDV-4",
+      "score": 0.0315,
+      "label": "AGENT GUIDE",
+      "text": "Never read out the full phone number, email or street address, even to a verified customer."
+    }
+  ],
+  "tool_calls": [
+    "lookup_order(order_id=77461439, verification_value=1266)"
+  ],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "customer order verification failed with incorrect mobile number last four digits",
+    "reply_lang": "hi",
+    "intent": "verification_failed",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 3.18,
+  "spoken": "क्षमा करें, आपके द्वारा दी गई जानकारी फिर से मेल नहीं खा रही है। सुरक्षा कारणों से मैं इस ऑर्डर की जानकारी साझा नहीं कर पाऊंगा। कृपया अपने रजिस्टर्ड मोबाइल नंबर से दोबारा संपर्क करें।",
+  "reply_audio": "sample_outputs\\replies\\PC021\\turn4.wav"
+}

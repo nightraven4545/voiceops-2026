@@ -64,7 +64,7 @@
       "damage_report"
     ]
   },
-  "seconds": 6.6,
+  "seconds": 3.18,
   "spoken": "Main ZentroMart ka AI assistant hoon. Agar aapka saman tuta hua aaya hai, toh aapko ise delivery ke 48 hours ke andar report karna hoga. Iske liye aapko saman aur uski packaging ki photo bhejni hogi. Kya aap mujhe apna Order ID bata sakte hain taaki main iska process shuru karne mein aapki madad kar sakun?",
   "reply_audio": "sample_outputs\\replies\\PQ0048.wav"
 }

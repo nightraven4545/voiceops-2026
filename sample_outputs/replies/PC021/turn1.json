@@ -1,0 +1,68 @@
+{
+  "file": "sample_outputs\\inputs\\PC021\\turn1.wav",
+  "conversation": "PC021",
+  "transcript": "namaste mujhe apne order ke baare mein madad chaahiye",
+  "transcript_hi": "नमस्ते, मुझे अपने ऑर्डर के बारे में मदद चाहिए।",
+  "reply": "नमस्ते, मैं ZentroMart का AI सपोर्ट असिस्टेंट हूँ। आपके ऑर्डर के बारे में सहायता करने के लिए, कृपया मुझे अपना ऑर्डर ID बताएं ताकि मैं इसे देख सकूं।",
+  "decision": "clarify",
+  "lang": "hi",
+  "sources": [
+    "STY-1",
+    "IDV-1",
+    "IDV-2"
+  ],
+  "retrieved": [
+    {
+      "id": "CAN-1",
+      "score": 0.0483,
+      "label": "CURRENT POLICY",
+      "text": "Any order can be cancelled free of charge until it is shipped, by the customer from My Orders in the app. The support assistant cannot cancel orders itself; it guides the customer to My Orders. The refund is initiated immediately."
+    },
+    {
+      "id": "IDV-2",
+      "score": 0.046,
+      "label": "AGENT GUIDE",
+      "text": "Ask for the order ID, then ask for **one** of: the last 4 digits of the registered phone number, or the delivery pincode for that order. Compare with the `phone_last4` or `delivery_pincode` fields from order lookup."
+    },
+    {
+      "id": "TRK-2",
+      "score": 0.0436,
+      "label": "HELP ARTICLE",
+      "text": "If an order shows Delivered but the customer has not received it, check with family, neighbours or the building security, then report it within 48 hours as a missing item under DWM-1."
+    },
+    {
+      "id": "IDV-1",
+      "score": 0.0396,
+      "label": "AGENT GUIDE",
+      "text": "Before sharing anything about a specific order (status, items, address, amounts, refund details), verify the customer. General policy questions need no verification."
+    },
+    {
+      "id": "STY-1",
+      "score": 0.0375,
+      "label": "AGENT GUIDE",
+      "text": "Introduce yourself as ZentroMart's AI support assistant in your first reply."
+    },
+    {
+      "id": "CAN-3",
+      "score": 0.0372,
+      "label": "CURRENT POLICY",
+      "text": "Grocery orders can be cancelled up to 2 hours before the start of the chosen delivery slot.\nIf the slot start time is not in the order record, ask the customer for the time shown in My Orders before confirming whether the cutoff has passed."
+    }
+  ],
+  "tool_calls": [],
+  "ticket_id": null,
+  "understand": {
+    "english_query": "general order assistance",
+    "reply_lang": "hi",
+    "intent": "general_inquiry",
+    "products": [],
+    "payment_method": "none",
+    "refund_initiated_on": "",
+    "delivered_on": "",
+    "ordered_on": "",
+    "flags": []
+  },
+  "seconds": 3.2,
+  "spoken": "नमस्ते, मैं ZentroMart का AI सपोर्ट असिस्टेंट हूँ। आपके ऑर्डर के बारे में सहायता करने के लिए, कृपया मुझे अपना ऑर्डर ID बताएं ताकि मैं इसे देख सकूं।",
+  "reply_audio": "sample_outputs\\replies\\PC021\\turn1.wav"
+}

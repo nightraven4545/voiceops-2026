@@ -20,6 +20,7 @@ python run.py --input sample_outputs/inputs --output sample_outputs/replies
 | `PQ0058.wav` | Mera order (Kestrel K7 Smartphone 256 GB) parso deliver hua… | Hinglish | relative date + electronics window |
 | `silence.wav` | (nothing) | — | recovery: "Sorry, I didn't catch that" |
 | `PC002/turn1-4.wav` | help → order ID → last 4 digits → "approve the TV replacement" | Hinglish | verification, then escalation with a ticket |
+| `PC021/turn1-4.wav` | help → order ID → wrong last 4 digits → the same wrong digits again | Hindi | one retry, then refuse and share nothing (IDV-3); replies in Hindi although the profile says Marathi |
 
 **Outputs** (`replies/`), one set per input file:
 - `.wav`: the spoken reply
@@ -35,6 +36,7 @@ python run.py --input sample_outputs/inputs --output sample_outputs/replies
 `results.csv` summarises the whole run.
 
 Notes:
-- These replies were replayed from the evaluation run's cached LLM answers; speech in and out is fresh Gnani STT/TTS.
+- These replies were replayed from cached LLM answers with live LLM calls blocked; speech in and out is fresh Gnani STT/TTS.
+  - The first 13 files reuse the evaluation run's answers.
+  - PC021 reuses its live voice run of 25 Oct 2026, where all 4 turns passed the practice gold (decision, tool calls, required and forbidden phrases).
 - Short delays here reflect the cache, not live LLM latency.
-- A Hindi failed-verification conversation (PC021) will be added once it reruns with the latest Hindi-reply fix.

@@ -1,21 +1,20 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 13:00 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 13:20 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
-**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 93%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` are done. A clean clone installs and runs (44/44 tests). What's left is mostly finishing and submitting.
+**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 93%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (45/45 tests). What's left is mostly finishing and submitting.
 
-**In flight:** nothing.
+**In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
 - The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
+  - 12/13 decisions matched the committed `sample_outputs`. **PQ0002** (spoken SKU garbled to "s q le 12") answered `clarify` ("which product or order ID?") instead of the committed `answer` ("I don't have that information" + human). Same transcript; the difference is Gemini sampling, because `src/` sets no `temperature`. Both replies are acceptable. Cached results are stable, but fresh runs (and the organizers' run) can differ turn by turn.
 - Live latency on the free tier: median 20.9 s per voice turn (9–49 s).
 - `%USERPROFILE%\vofresh`, including its `.env` copy of the keys, has been **deleted**.
 
 **Next actions, in order (deadline 26 Oct 2026):**
 1. ~~Clean-clone LLM check + delete `vofresh`~~: done (see above).
-2. **PC021 by voice (Hindi failed verification), after 12:30 IST, ~10 LLM calls:**
-   - Run `run.py` on `test_audio/PC021`. Expect: turns in Devanagari Hindi; turn 3 `lookup_order(order_id=77461439, verification_value=1266)` → clarify; turn 4 → refuse.
-   - Then add it to `sample_outputs/`: copy the inputs, rerun into `replies`, add a README row. Commit.
+2. ~~PC021 by voice, add to `sample_outputs/`~~: done 13:16 IST (see Checklist history).
 3. **Demo video, recorded by the user:** ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar) or Clipchamp. Suggested script:
    1. English: "How long does a refund to UPI take?" → follow-up "And if I paid by card?"
    2. Hinglish order flow: give order ID 8978 2837, then last 4 digits 4533, then "TV damaged, replacement approve kar do" → ticket + handover
@@ -78,11 +77,11 @@ Submission:
 | Area | State |
 |---|---|
 | Agent (`src/`), batch runner (`run.py`), demo (`app.py`) | Built and working |
-| Rule + agent tests | 44 passing (`python -m pytest tests`) |
+| Rule + agent tests | 45 passing (`python -m pytest tests`) |
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
-| Voice end to end | 17/17 files processed, batch never stops; Hindi digits verified live (PC021). Hindi-language fix verified on turn 2; turns 3–4 hit the daily quota on the retest |
+| Voice end to end | 17/17 files processed, batch never stops. PC021 (Hindi, failed verification twice) verified live on 25 Oct: 4/4 turns pass the practice gold, replies in Devanagari, no private data in any Gemini prompt or reply. Reply WAVs now carry real header sizes |
 | Report | `report/report.md` → `report/report.pdf` (3 pages, A4). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
-| Sample outputs | `sample_outputs/`: 13 files (8 questions, PC002 conversation, silence), replayed from cached LLM answers with live calls blocked; 0 errors. PC021 to be added after a live rerun |
+| Sample outputs | `sample_outputs/`: 17 files (8 questions, PC002 and PC021 conversations, silence), replayed from cached LLM answers with live calls blocked (`LLM_BASE_URL` pointed at a dead port); 0 errors |
 | Git | **Private** repo https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
 
 ## Results (practice set, `eval/results/<model>/`)
@@ -107,6 +106,13 @@ Remaining failures:
   - over-cautious abstention: PC011/PC012 "what if I'm not home"
   - Hindi synonyms the strict scorer misses: PC009, PC016
 - **Single questions:** PQ0053 invented an answer; PQ0058 asked "which colour?" unnecessarily.
+- **Voice PC021 (scorer passes; noted, not fixed):**
+  - turn 4 omits IDV-3's "offer general policy help" (the text-eval reply included it)
+  - turn 2 greets again mid-conversation
+  - the first turn of a call takes ~30 s (cold start of the embedding model and BM25)
+- **Latent, not triggered by any practice case:**
+  - the `FORBIDDEN` reply check retries once but has no final fallback if the retry still matches
+  - `rules.numbers()` joins space-separated digit groups, so a bare "4 1266" would read as 41266
 
 ## Key decisions (and why)
 - **Agent LLM = Gemini `gemini-3.1-flash-lite`, free tier, via the OpenAI-compatible endpoint.**
@@ -127,10 +133,9 @@ Remaining failures:
 - [x] Refill missing 3.1 rows: all complete.
 - [x] Report: every number taken from the CSVs; 3.5 vs 3.1 comparison included.
 - [x] Voice: a Hindi caller stays in Hindi when reading out digits (`State.lang`). Verified live on PC021 turn 2.
-- [ ] After the quota reset (12:30 IST): rerun PC021 by voice to confirm turns 3–4 in Hindi, then add it to `sample_outputs/`:
-  1. copy `test_audio/PC021` to `sample_outputs/inputs/`
-  2. rerun `run.py` into `sample_outputs/replies`
-  3. add a row to `sample_outputs/README.md`
+- [x] PC021 by voice, live, 25 Oct 13:01 IST (3 fresh Gemini calls, rest cached): `clarify, clarify, clarify, refuse`, the gold tool calls, 4/4 turns pass the repo's own conversation scorer. Three independent read-only checks (gold scorer, privacy, voice) confirmed it. Added to `sample_outputs/` (inputs, replies, README row).
+- [x] **IDV-3 lock bypass fixed** (found by the privacy check): a new order ID used to reset `attempts`/`locked`, so alternating order IDs gave unlimited guesses at the last 4 digits. `State.failed` now counts failures per order for the whole conversation, and naming a locked order again gets `refuse`. A caller's other orders still verify. Test `test_switching_orders_keeps_the_lock`. The cached `conversations` and `full` evals replay byte-identical.
+- [x] **Reply WAV header fixed**: Gnani streams `0xFFFFFFFF` RIFF/data sizes, so Python's `wave` read every reply as ~24.8 h. `speak()` now rewrites the file once with soundfile (same samples, PCM 16). All 17 sample replies regenerated; reply texts unchanged.
 - [ ] Optional quality fix: a post-check that every "must state" computed fact (refund timing, RRN) appears in the reply.
 - [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
 - [x] report.pdf (3 pages).
@@ -194,6 +199,9 @@ Rules:
 ```
 
 ## Gotchas (each cost time once)
+- **Replays without spending quota:** set `LLM_BASE_URL=http://127.0.0.1:9/v1` in the shell (`.env` doesn't override it). Cache hits still work; a miss fails loudly instead of calling Gemini.
+- **Timers:** a `sleep 60` wait loop fired 13 min late after the PC slept. Check result files, not timers.
+- **Deleting a venv on Windows:** `Remove-Item` fails on torch's long paths. Git Bash `rm -rf` works but may need a second pass ("Permission denied" on the first).
 - **Gemini free quota** is per model and resets at **midnight Pacific = 12:30 IST**, not midnight IST.
   - On 429s, `eval/evaluate.py` stops after 3 failures in a row and keeps partial results.
   - LLM responses are cached in `.cache/llm/`, keyed by model + prompt, so re-runs only pay for changed prompts.

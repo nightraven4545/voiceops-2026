@@ -53,7 +53,7 @@
   "tool_calls": [
     "create_ticket()"
   ],
-  "ticket_id": "TKTec728d944c74495aaf20206b3352553a",
+  "ticket_id": "TKT992f970ad27e4240957e03e1cb0fc01f",
   "understand": {
     "english_query": "replacement approval process for damaged Zentro Vista 43 inch 4K smart TV",
     "reply_lang": "hi-en",
@@ -70,7 +70,7 @@
       "damage_report"
     ]
   },
-  "seconds": 2.74,
+  "seconds": 3.01,
   "spoken": "Main samajh sakta hoon ki aap replacement chahte hain. Maine aapke damaged TV ke liye support ticket raise kar diya hai aur hamari priority resolution team ke ek colleague jald hi aapse contact karenge. Woh is mamle mein aapki aage ki sahayata karenge.",
   "reply_audio": "sample_outputs\\replies\\PC002\\turn4.wav"
 }
