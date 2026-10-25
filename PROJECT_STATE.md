@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 16:50 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 17:15 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -12,6 +12,15 @@
   - Interface rule (p.12): "anything that plays and records audio: a web page or a notebook". The Gradio page qualifies; UI design earns no marks.
   - Watch-out: "voice experience" judges "clear, short replies". Median reply is 30–37 words, but 12/148 exceed 50 (max 84). Pick short-answer questions for the demo.
   - Course FAQ: "Do not submit generated code you cannot explain", and the top 50 demo live. Rehearse explaining one turn: STT → understand → verify/tools → retrieve → compose → guards → TTS.
+- **Brief PDF forensics, 25 Oct 17:15:** no traps found.
+  - No JavaScript, auto-run actions, forms, encryption, hidden layers, invisible-text mode, tiny text or off-page text.
+  - The 10 annotations are links to Gnani's site/docs and the dataset download.
+  - The one embedded file is a C2PA provenance record signed by OpenAI: an image in the brief was AI-generated.
+  - All 14 pages were rendered with pdf.js; each matches its extracted text.
+  - Page 5 (dataset schema table, inserted later; title "Dataset Schema Reordered") uses a font without a character map, so its text extracts as garbage but reads fine as an image.
+  - Pages 13–14 extract as spaced letters (letter-spacing); harmless.
+  - Our dataset is the refined release named in the brief (CHANGELOG, verification-gated `lookup_order`), and `python validate_dataset.py` → PASS.
+  - Renders are kept in git-ignored `outputs/brief_check/`.
 - The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
   - 12/13 decisions matched the committed `sample_outputs`. **PQ0002** (spoken SKU garbled to "s q le 12") answered `clarify` ("which product or order ID?") instead of the committed `answer` ("I don't have that information" + human). Same transcript; the difference is Gemini sampling, because `src/` sets no `temperature`. Both replies are acceptable. Cached results are stable, but fresh runs (and the organizers' run) can differ turn by turn.
 - Live latency on the free tier: median 20.9 s per voice turn (9–49 s).
