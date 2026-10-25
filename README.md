@@ -9,6 +9,7 @@ audio ─► Gnani STT (en-IN, + hi-IN for Hindi speech) ─► agent ─► Gna
      code: verification state machine · lookup_order / create_ticket · date maths · escalation rules
      retrieval: BM25 + multilingual embeddings over 84 KB sections, fused (RRF), labelled by authority
      LLM call 2: compose (decision, reply, evidence IDs)  ─►  code guards (no fake actions, no leaks)
+     only when needed: one more compose call (a wider search before saying "I don't know", or a left-out required fact)
 ```
 
 The LLM only understands and phrases. Dates, return windows, refund timelines, verification retries and escalation thresholds are deterministic Python, unit-tested against the practice gold answers, and unverified order data never reaches the model.

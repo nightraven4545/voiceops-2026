@@ -101,8 +101,9 @@ BASELINE_SCHEMA = _schema({"decision": {"type": "string", "enum": DECISIONS}, "r
 _client, _last_call = None, 0.0
 
 
-def llm_json(system, user, schema, cache_only=False):
-    """One structured-output call, cached on disk so eval re-runs are free and repeatable."""
+def llm_json(system, user, schema, cache_only=False, optional=False):
+    """One structured-output call, cached on disk so eval re-runs are free and repeatable.
+    optional: a quality extra the caller can do without, so it fails fast instead of retrying."""
     global _client, _last_call
     path = CACHE / (hashlib.sha256(json.dumps([MODEL, system, user, schema]).encode()).hexdigest() + ".json")
     if path.exists():
@@ -113,7 +114,7 @@ def llm_json(system, user, schema, cache_only=False):
     _last_call = time.time()
     if PROVIDER == "anthropic":
         _client = _client or anthropic.Anthropic(max_retries=5)
-        resp = _client.messages.create(model=MODEL, max_tokens=4000, system=system,
+        resp = (_client.with_options(max_retries=0, timeout=30) if optional else _client).messages.create(model=MODEL, max_tokens=4000, system=system,
                                        messages=[{"role": "user", "content": user}],
                                        output_config={"effort": "low", "format": {"type": "json_schema", "schema": schema}})
         if resp.stop_reason != "end_turn":
@@ -121,7 +122,7 @@ def llm_json(system, user, schema, cache_only=False):
         text = next(b.text for b in resp.content if b.type == "text")
     else:
         _client = _client or OpenAI(base_url=os.environ["LLM_BASE_URL"], api_key=os.environ["LLM_API_KEY"], max_retries=5)
-        resp = _client.chat.completions.create(
+        resp = (_client.with_options(max_retries=0, timeout=30) if optional else _client).chat.completions.create(
             model=MODEL, reasoning_effort="low",
             messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
             response_format={"type": "json_schema", "json_schema": {"name": "output", "schema": schema, "strict": True}})
@@ -173,6 +174,15 @@ def _catalog_line(group):
     return (f"{' ; '.join('products.csv:' + x['sku'] for x in group)} | {title} | category {p['return_category']} "
             f"({'not returnable' if days is None else f'standard {days}-day return window'}) | price {price} | "
             f"sold by {p['fulfilled_by']} | ZentroMart Assured: {assured} | brand warranty {p['warranty_months']} months")
+
+
+def evidence_for(retrieved):
+    """Sections the model sees, strongest authority first; the KB's authority note joins when weaker sources do."""
+    shown = list(retrieved)
+    if any(c["doc_type"] in ("faq", "marketing") or c["status"] == "superseded" for c in retrieved):
+        shown.append(kb.BY_ID["KB-00.1"])
+    shown.sort(key=lambda c: kb.RANK[c["doc_type"]])
+    return shown, "\n\n".join(f"[{c['id']}] {kb.label(c)} · {c['doc_title']} - {c['heading']}\n{c['text']}" for c in shown)
 
 
 @dataclass
@@ -253,10 +263,8 @@ class Agent:
         elif alt_text and st.lang == "hi" and u["reply_lang"] == "hi-en":
             u = {**u, "reply_lang": "hi"}  # a Hindi caller reading out digits is not switching to Hinglish
         st.lang = u["reply_lang"]
-        retrieved = kb.retrieve([u["english_query"], norm], weights=[1.0, 0.5])
-        shown = list(retrieved)
-        if any(c["doc_type"] in ("faq", "marketing") or c["status"] == "superseded" for c in retrieved):
-            shown.append(kb.BY_ID["KB-00.1"])
+        queries = [u["english_query"], norm]
+        retrieved = kb.retrieve(queries, weights=[1.0, 0.5])
 
         facts, catalog, flags, must = [], [], set(u["flags"]), []
         if self.mode == "full":
@@ -286,9 +294,7 @@ class Agent:
             situation.append("A human must take over: say you have raised a support ticket and a human colleague "
                              "will contact them. Promise no outcome, amount or time.")
 
-        shown.sort(key=lambda c: kb.RANK[c["doc_type"]])
-        evidence = "\n\n".join(f"[{c['id']}] {kb.label(c)} · {c['doc_title']} - {c['heading']}\n{c['text']}" for c in shown)
-        prompt = "\n\n".join(filter(None, [
+        head = "\n\n".join(filter(None, [
             f"CONVERSATION SO FAR:\n{history}",
             f"CUSTOMER'S LATEST MESSAGE:\n{norm}",
             f"REPLY LANGUAGE: {u['reply_lang']}\nFIRST REPLY: {'yes' if first else 'no'}",
@@ -296,8 +302,9 @@ class Agent:
             required and f"REQUIRED DECISION: {required}",
             st.order and "VERIFIED ORDER:\n" + json.dumps(st.order, ensure_ascii=False, default=str),
             facts and "COMPUTED FACTS:\n" + "\n".join(facts),
-            catalog and "CATALOG:\n" + "\n".join(catalog),
-            f"EVIDENCE:\n{evidence}"]))
+            catalog and "CATALOG:\n" + "\n".join(catalog)]))
+        shown, evidence = evidence_for(retrieved)
+        prompt = f"{head}\n\nEVIDENCE:\n{evidence}"
         schema = NO_ESCALATE_SCHEMA if self.mode == "full" and required is None else COMPOSE_SCHEMA
         out = llm_json(COMPOSE_SYSTEM, prompt, schema)
         if FORBIDDEN.search(out["reply"]):
@@ -305,12 +312,27 @@ class Agent:
                            "Rewrite it without that:\n" + out["reply"], schema)
         decision = required or out["decision"]
         abstain = decision == "answer" and required is None and not out["covered"]  # abstain instead of guessing
+        if abstain and self.mode == "full":  # second look: the answer may rank just below the top sections
+            wide = kb.retrieve(queries, k=12, weights=[1.0, 0.5])
+            wide_shown, wide_evidence = evidence_for(wide)
+            wide_prompt = f"{head}\n\nEVIDENCE:\n{wide_evidence}"
+            try:
+                second = llm_json(COMPOSE_SYSTEM, wide_prompt, schema, optional=True)
+            except Exception:  # on any failure, abstain as before
+                second = None
+            # Only new content counts: the same sections judged again is a re-roll, agent guides and KB notes
+            # (greeting, handover) never answer a question, and citing every section shows no grounding.
+            new = {c["id"] for c in wide if c["doc_type"] not in ("meta", "agent_guide")} - {c["id"] for c in shown}
+            cited = set(second["evidence"]) if second else set()
+            if second and second["covered"] and second["decision"] == "answer" and cited & new \
+                    and {c["id"] for c in wide_shown} - cited and not FORBIDDEN.search(second["reply"]):
+                out, retrieved, shown, prompt, abstain = second, wide, wide_shown, wide_prompt, False
         if not abstain and (missing := [f for f in must if not rules.states(out["reply"], f)]):
             try:  # optional quality rewrite: on any failure the first reply stands
                 fix = llm_json(COMPOSE_SYSTEM, prompt + "\n\nYOUR PREVIOUS REPLY LEFT OUT FACTS THE CUSTOMER NEEDS "
                                "HERE. Keep everything it says (decision, any ticket or handover, dates, amounts) and "
                                "also state these, in the same language:\n" + "\n".join(missing)
-                               + "\nPrevious reply:\n" + out["reply"], schema)
+                               + "\nPrevious reply:\n" + out["reply"], schema, optional=True)
             except Exception:
                 fix = None
             if fix and all(rules.states(fix["reply"], f) for f in [*missing, out["reply"]]) \

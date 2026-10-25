@@ -1,4 +1,5 @@
 """Conversation logic with a scripted LLM: verification, tool calls, guards. No API calls."""
+import re
 import sys
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from src import agent, kb  # noqa: E402
 
 
 def fake_llm(compose):
-    def llm_json(system, user, schema):
+    def llm_json(system, user, schema, **_):
         if schema is agent.UNDERSTAND_SCHEMA:
             msg = user.split("LATEST MESSAGE:")[-1].lower()
             return {"english_query": "damaged item replacement" if "damage" in msg else
@@ -81,7 +82,7 @@ def test_switching_orders_keeps_the_lock(scripted):  # IDV-3: naming another ord
 def test_post_check_adds_a_left_out_fact(monkeypatch, order, proof, ask, needed):
     composed = []
 
-    def llm_json(system, user, schema):
+    def llm_json(system, user, schema, **_):
         if schema is agent.UNDERSTAND_SCHEMA:
             msg = user.split("LATEST MESSAGE:")[-1].lower()
             return {"english_query": "where is my refund" if "refund" in msg else "order help", "reply_lang": "hi-en",
@@ -103,7 +104,7 @@ def test_post_check_adds_a_left_out_fact(monkeypatch, order, proof, ask, needed)
 def test_post_check_failure_keeps_first_reply_and_ticket(scripted, monkeypatch):
     llm = fake_llm({"reply": "Ticket raise kar raha hoon."})
 
-    def flaky(system, user, schema):
+    def flaky(system, user, schema, **_):
         if "LEFT OUT" in user:
             raise RuntimeError("429")
         return llm(system, user, schema)
@@ -114,6 +115,40 @@ def test_post_check_failure_keeps_first_reply_and_ticket(scripted, monkeypatch):
     a.respond("Order number hai 1664 0894."), a.respond("Last four digits 2108 hain.")
     r = a.respond("Mera refund kahan hai?")  # overdue refund: escalate, and the RRN is a must-state fact
     assert (r["reply"], r["decision"], r["tool_calls"]) == ("Ticket raise kar raha hoon.", "escalate", ["create_ticket()"])
+
+
+@pytest.mark.parametrize("mode, second, answered", [
+    ("full", {}, True),                                   # the wider search found the answer
+    ("full", {"evidence": ["TRK-2"]}, False),             # same sections judged again: a re-roll
+    ("full", {"evidence": ["ESC-4"]}, False),             # a new agent-guide section answers nothing
+    ("full", {"evidence": "all"}, False),                 # citing every section shows no grounding
+    ("full", {"covered": False}, False),
+    ("full", {"decision": "clarify"}, False),             # only a plain answer may replace an abstention
+    ("full", {"reply": "I have refunded your money, call +91 98765 43210."}, False),  # FORBIDDEN
+    ("full", "fail", False),                              # the extra call failed: abstain as before
+    ("rag", {}, False)])                                  # Step 2 baseline keeps its single look
+def test_second_look_before_abstaining(monkeypatch, mode, second, answered):  # practice PC011: DEL-3 ranked 11th
+    ranked = [{**kb.BY_ID[i], "score": 0.0} for i in ("TRK-2", "RET-2", "CAN-3", "DEL-1", "IDV-3", "TRK-1",
+                                                      "RVP-2", "ESC-4", "RETv3-2", "PAY-3", "DEL-3", "REF-3")]
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: ranked[:k])
+
+    def llm_json(system, user, schema, **_):
+        if schema is agent.UNDERSTAND_SCHEMA:
+            return {"english_query": "delivery when customer is not at home", "reply_lang": "en", "intent": "delivery",
+                    "products": [], "payment_method": "none", "refund_initiated_on": "", "delivered_on": "",
+                    "ordered_on": "", "flags": []}
+        if "[DEL-3]" not in user:
+            return {"covered": False, "decision": "answer", "evidence": [], "ticket_summary": "", "reply": "Not sure."}
+        if second == "fail":
+            raise RuntimeError("429")
+        out = {"covered": True, "decision": "answer", "evidence": ["DEL-3"], "ticket_summary": "",
+               "reply": "The courier makes up to 3 attempts.", **second}
+        return {**out, "evidence": re.findall(r"^\[([^\]]+)\]", user, re.M)} if out["evidence"] == "all" else out
+
+    monkeypatch.setattr(agent, "llm_json", llm_json)
+    r = agent.Agent(mode).respond("And what if I'm not at home?")
+    assert r["reply"].endswith("up to 3 attempts.") is answered and ("DEL-3" in r["sources"]) is answered
+    assert r["reply"].endswith(agent.NOT_COVERED["en"]) is not answered
 
 
 def test_hindi_voice_caller_keeps_hindi(scripted):

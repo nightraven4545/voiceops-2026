@@ -1,10 +1,10 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 13:50 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 14:25 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
-**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 96%, tool calls 100% exact), documented, and pushed. The report PDF and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (55/55 tests). What's left is mostly finishing and submitting.
+**Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
 - The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
@@ -29,7 +29,7 @@
    - deadline time
 5. **Optional, only with spare time and quota:**
    - ~~a post-check that "must state" computed facts (refund timing, RRN) appear in the reply~~: done 25 Oct (see Checklist history)
-   - softer abstention on "what if I'm not home?" (PC011/PC012). This one changes prompts, so it needs a real eval rerun (full + conversations ≈ 300 calls); don't start it on submission day.
+   - ~~softer abstention on "what if I'm not home?" (PC011/PC012)~~: done 25 Oct as a "second look" (see Checklist history)
 6. **Submission:**
    - make the repo public: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences`
    - build `<team>_voiceops.zip` with `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf` (copied from `report/`), `demo.mp4`, `sample_outputs/`
@@ -43,7 +43,7 @@
 - the rejected superseded-section down-weighting
 - the gold-aligned decisions: unanswerable → `answer`; compensation → `refuse`
 
-**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free. Used on 25 Oct after the reset: about 30 (clean clone 24, PC021 3, post-check 3).
+**Budget:** ~500 Gemini calls/day per model, reset 12:30 IST. A full eval ≈ 450 calls. Cached answers are free. Used on 25 Oct after the reset: about 42 (clean clone 24, PC021 3, post-check 3, second look 10, samples 2). The second look adds 1 call per abstaining turn (about 5% of turns), so a 200-file run needs ≈ 410.
 
 ## Goal and deadline
 IIT-G C&A × Gnani.ai "VoiceOps 2026": a voice customer-support agent for the fictional store ZentroMart. Brief: `C:\Users\shres\OneDrive\Documents\capstone_AI_ML\6ad64c83eae85_voiceops_2026_capstone_brief.pdf`.
@@ -75,17 +75,17 @@ Submission:
 | Area | State |
 |---|---|
 | Agent (`src/`), batch runner (`run.py`), demo (`app.py`) | Built and working |
-| Rule + agent tests | 55 passing (`python -m pytest tests`) |
+| Rule + agent tests | 64 passing (`python -m pytest tests`) |
 | Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
 | Voice end to end | 17/17 files processed, batch never stops. PC021 (Hindi, failed verification twice) verified live on 25 Oct: 4/4 turns pass the practice gold, replies in Devanagari, no private data in any Gemini prompt or reply. Reply WAVs now carry real header sizes |
-| Report | `report/report.md` → `report/report.pdf` (3 pages, A4). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
+| Report | `report/report.md` → `report/report.pdf` (4 pages, A4: the limit). Rebuild: `python report/build_pdf.py` (needs `pip install markdown`; uses headless Chrome, since Edge on this PC writes nothing) |
 | Sample outputs | `sample_outputs/`: 17 files (8 questions, PC002 and PC021 conversations, silence), replayed from cached LLM answers with live calls blocked (`LLM_BASE_URL` pointed at a dead port); 0 errors |
 | Git | **Private** repo https://github.com/nightraven4545/voiceops-2026 (`main`, pushed 25 Oct). Author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. Make it public only at submission: `gh repo edit nightraven4545/voiceops-2026 --visibility public --accept-visibility-change-consequences` |
 
 ## Results (practice set, `eval/results/<model>/`)
 | Model | Step 1 baseline | Step 2 RAG | Full agent | Full, `asr_text` | Conversations (turns) | Tool calls |
 |---|---|---|---|---|---|---|
-| `gemini-3.1-flash-lite` (**submission**) | 15% | 83% | **96%** | **96%** | **96%** (92/96 turns; dev 72/75, test 20/21), decisions 100% | 100% exact |
+| `gemini-3.1-flash-lite` (**submission**) | 15% | 83% | **96%** | **96%** | **98%** (94/96 turns; dev 74/75, test 20/21), decisions 100% | 100% exact |
 | `gemini-3.5-flash-lite` (earlier) | 21% | 67%* | 92% | — | incomplete (quota) | 100% exact |
 
 \*3.5's Step 2 ran before the prompt fixes.
@@ -100,7 +100,6 @@ Retrieval Recall@5, using the cached 3.1 rewrites:
 
 Remaining failures:
 - **Conversations:**
-  - over-cautious abstention: PC011/PC012 "what if I'm not home"
   - Hindi synonyms the strict scorer misses: PC009, PC016
 - **Single questions:** PQ0053 invented an answer; PQ0058 asked "which colour?" unnecessarily.
 - **Voice PC021 (scorer passes; noted, not fixed):**
@@ -141,7 +140,14 @@ Remaining failures:
   - **Cost:** a cache-only replay showed only PC010-t4, PC019-t4 and PC020-t4 (all dev) need a call; every other prompt is byte-identical. The live run used exactly 3 Gemini calls.
   - **Result:** conversations 89 → 92/96 (dev 69 → 72/75, test 20/21 unchanged). The full and full-ASR question evals replay byte-identical.
   - **Reviewed** before spending quota by 3 read-only reviewers (policy, code, voice). Fixes from the review: the guarded call, the keep-the-first-reply's-numbers rule, grader-exact number matching, skip-on-abstain, and a Devanagari "कैंसिल/रिफ़ंड … कर दिया" branch in `FORBIDDEN` (no cached reply matches it).
-  - **Known limits:** COD's "nothing is charged" has no digits, so it's never enforced. An unrelated 7 and 10 in the reply count as stated. Facts with dates or ₹ amounts would need normalisation before being added to `must`.
+  - **Known limits:** COD's "nothing is charged" has no digits, so it's never enforced.
+- [x] **Second look before abstaining** (25 Oct; the "softer abstention" item).
+  - **Diagnosis:** PC011/PC012-t4 ("And what if I'm not at home?") were a retrieval miss, not over-caution. DEL-3 ("up to 3 delivery attempts") ranked 11th and 8th, outside the top 6, so `covered=false` was right. Loosening the gate would have shipped PC012's invented draft ("the courier will try again the next day").
+  - **Fix (full mode only):** when the gate is about to abstain, compose once more with the top 12. The second reply is used only if it is `answer` + `covered`, cites a **new content section** (not `meta` or `agent_guide`, not one already shown) without citing every section, and passes `FORBIDDEN`. Otherwise, or on failure, it abstains as before. The must-state rewrite then builds on the wide prompt. Optional calls (`llm_json(optional=True)`) skip client retries, so a 429 falls back at once instead of after ~17 s.
+  - **Cost and result:** a cache-only replay showed exactly 10 new calls across all three evals: the 2 targets plus the 8 correct abstentions (PQ0004/09/15/37 clean, PQ0009/15/37/53 ASR). Live: all 8 still abstain, and PC011/PC012-t4 now pass citing DEL-3. Conversations 92 → 94/96 (dev 72 → 74/75; test 20/21 unchanged, since no test turn could change). Question evals byte-identical.
+  - **Reviewed** by 3 read-only reviewers before any quota was spent. From the review: answer-only acceptance, content-only "new" sections, the measure-against-shown fix, the cite-everything rejection, the wide prompt carried into the post-check, fail-fast optional calls, and 9 test rows. A mutation check showed every guard is pinned by a test.
+  - **Samples:** PQ0002 and PQ0004 now take the second look (2 live calls). Both still abstain with identical text, so the committed `sample_outputs` were kept and their second-look answers are cached. The demo's "Is there a student discount?" still abstains (checked live; cached).
+  - **Still failing:** PQ0053 (clean) and PQ0004 (ASR) invent an answer with `covered=true`, so they never reach the gate. An unrelated 7 and 10 in the reply count as stated. Facts with dates or ₹ amounts would need normalisation before being added to `must`.
 - [x] `sample_outputs/` (13 files, no `.env` or dataset inside).
 - [x] report.pdf (3 pages).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.
