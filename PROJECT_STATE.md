@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 20:35 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 21:05 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -31,7 +31,12 @@
 **Next actions, in order (deadline 26 Oct 2026):**
 1. ~~Clean-clone LLM check + delete `vofresh`~~: done (see above).
 2. ~~PC021 by voice, add to `sample_outputs/`~~: done 13:16 IST (see Checklist history).
-3. **Demo video, recorded by the user:** ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar, mic on via Win+G) or Clipchamp. The brief (p.11) asks for "a demo of a **spoken** conversation": speak each question; type only if STT misses digits. Do a warm-up question and "New call" before recording (the first turn takes ~30 s). Suggested script:
+3. **Demo video: DONE 25 Oct 21:00.** `demo.mp4` = the user's `Sample_1.mp4`, unchanged.
+   - Committed (`c5e4efa`, 24 MB) and in the zip.
+   - It runs **2:10, over the brief's 2-minute limit**. The user chose to keep it as is; ~50 s of it is silent loading waits if a trim is ever wanted.
+   - Recorded on `gemini-3.5-flash-lite` (3.1 was returning 503s).
+   - Audio is fine (mean −30 dB, max −10 dB). Only the demo page is on screen.
+   - Original instructions, kept for reference: ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar, mic on via Win+G) or Clipchamp. The brief (p.11) asks for "a demo of a **spoken** conversation": speak each question; type only if STT misses digits. Do a warm-up question and "New call" before recording (the first turn takes ~30 s). Suggested script:
    1. English: "How long does a refund to UPI take?" → follow-up "And if I paid by card?"
    2. Hinglish order flow: give order ID 8978 2837, then last 4 digits 4533, then "TV damaged, replacement approve kar do" → ticket + handover
    3. "Is there a student discount?" → "I don't have that information"
@@ -52,7 +57,15 @@
      `git archive --format=zip -9 --add-file=report/report.pdf --add-file=demo.mp4 -o Dstonks_voiceops.zip HEAD README.md .env.example requirements.txt run.py src sample_outputs`
    - **Trial run 25 Oct 14:55** (without demo.mp4): 80 files, 10.4 MB. A scan with the real key values found neither key, no key patterns and no forbidden paths. Extracted to a fresh folder, the documented command answered PQ0003 end to end (live LLM, Gnani in and out, valid WAV) in 31 s.
    - The README now has the repository URL and a clone command (the brief requires the public GitHub URL).
-   - still needed: `demo.mp4`, the repo made public
+   - **Final zip BUILT 25 Oct 21:02:** `outputs/submission/Dstonks_voiceops.zip` (git-ignored), 30.4 MB, 81 files, from commit `c5e4efa`.
+     - All 8 items in the brief's layout (demo.mp4 included).
+     - Secret scan with the real key values: neither key found. No forbidden paths.
+     - A fresh extract plus `run.py` on PQ0003 answered correctly (REF-2), with a valid 6.2 s WAV and no errors (run on 3.5 because 3.1 was overloaded).
+     - **Rebuild it if anything is committed after `c5e4efa`.**
+   - still needed:
+     - **make the repo public (ask the user first)**
+     - the user uploads the zip and the repo URL on the course site
+     - afterwards, rotate both keys
    - put the public repo URL in the submission
 7. **After submission:** rotate the Gnani and Gemini keys; both were pasted in chat.
 
