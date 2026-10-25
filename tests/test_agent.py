@@ -63,6 +63,14 @@ def test_failed_verification_twice(scripted):  # practice PC021
     assert "IDV-3" in second["sources"] and a.state.order is None and a.state.locked
 
 
+def test_hindi_voice_caller_keeps_hindi(scripted):
+    a = scripted()
+    a.state.lang = "hi"  # earlier turn was answered in Hindi
+    r = a.respond("aakhiri chaar ank ek hazaar do sau chhiyasath hai", alt_text="आखिरी 4 अंक 1,266 हैं")
+    assert r["lang"] == "hi"
+    assert agent.Agent().respond("hello")["lang"] == "hi-en"  # text callers: model's choice stands
+
+
 def test_abstains_when_evidence_does_not_cover(scripted):
     r = scripted(covered=False, reply="We do not offer that.").respond("Is there a student discount?")
     assert r["reply"].endswith(agent.NOT_COVERED["hi-en"]) and r["decision"] == "answer"

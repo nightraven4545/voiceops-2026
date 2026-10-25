@@ -175,6 +175,7 @@ def _catalog_line(group):
 @dataclass
 class State:
     turns: list = field(default_factory=list)   # (role, text)
+    lang: str = None                            # reply language of the previous turn
     order_id: str = None
     awaiting_proof: bool = False
     attempts: int = 0
@@ -239,6 +240,9 @@ class Agent:
         u = llm_json(UNDERSTAND_SYSTEM, f"CONVERSATION SO FAR:\n{history}\n\nLATEST MESSAGE:\n{heard}", UNDERSTAND_SCHEMA)
         if re.search(r"[ऀ-ॿ]", norm):  # Devanagari input gets a Hindi reply (STY-4), loanwords or not
             u = {**u, "reply_lang": "hi"}
+        elif alt_text and st.lang == "hi" and u["reply_lang"] == "hi-en":
+            u = {**u, "reply_lang": "hi"}  # a Hindi caller reading out digits is not switching to Hinglish
+        st.lang = u["reply_lang"]
         retrieved = kb.retrieve([u["english_query"], norm], weights=[1.0, 0.5])
         shown = list(retrieved)
         if any(c["doc_type"] in ("faq", "marketing") or c["status"] == "superseded" for c in retrieved):

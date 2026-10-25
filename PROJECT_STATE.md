@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, ~08:00 IST**.
+> Last updated: **25 Oct 2026, ~09:30 IST**.
 
 ## Goal and deadline
 IIT-G C&A × Gnani.ai "VoiceOps 2026": a voice customer-support agent for the fictional store ZentroMart. Brief: `C:\Users\shres\OneDrive\Documents\capstone_AI_ML\6ad64c83eae85_voiceops_2026_capstone_brief.pdf`.
@@ -33,26 +33,34 @@ Submission:
 | Area | State |
 |---|---|
 | Agent (`src/`), batch runner (`run.py`), demo (`app.py`) | Built and working |
-| Rule + agent tests | 43 passing (`python -m pytest tests`) |
-| Evaluation on `gemini-3.1-flash-lite` | Done; rows lost to throttling being refilled (see results) |
-| Voice end to end | 17/17 test files, 0 errors; Hindi digits verified live (PC021) |
-| Report | `report/report.md` draft; TBDs being filled from 3.1 results |
+| Rule + agent tests | 44 passing (`python -m pytest tests`) |
+| Evaluation on `gemini-3.1-flash-lite` | **Complete**, every row filled |
+| Voice end to end | 17/17 files processed, batch never stops; Hindi digits verified live (PC021). Hindi-language fix verified on turn 2; turns 3–4 hit the daily quota on the retest |
+| Report | `report/report.md` complete, ~2.5 pages, every number checked against the CSVs; needs PDF export |
 | Git | Local commits only, author `Shreshtha <77679539+nightraven4545@users.noreply.github.com>`, no AI trailers. **No GitHub repo yet** (user's choice) |
 
 ## Results (practice set, `eval/results/<model>/`)
 | Model | Step 1 baseline | Step 2 RAG | Full agent | Full, `asr_text` | Conversations (turns) | Tool calls |
 |---|---|---|---|---|---|---|
-| `gemini-3.1-flash-lite` (**submission**) | 16% (51/52 rows) | 83% | 96% (50/52 rows) | 96% | 92% (75/96 rows) | 100% exact |
-| `gemini-3.5-flash-lite` (earlier) | 21% | 67%* | 92% | — | 83% (first full run) | 100% exact |
+| `gemini-3.1-flash-lite` (**submission**) | 15% | 83% | **96%** | **96%** | **93%** (96/96 turns), decisions 100% | 100% exact |
+| `gemini-3.5-flash-lite` (earlier) | 21% | 67%* | 92% | — | incomplete (quota) | 100% exact |
 
 \*3.5's Step 2 ran before the prompt fixes.
 
-Retrieval Recall@5, using the cached rewrites:
+Retrieval Recall@5, using the cached 3.1 rewrites:
 
 | Query | Recall@5 | Hindi |
 |---|---|---|
 | raw customer text | 0.68 | 0.43 |
-| English rewrite + raw at half weight | **0.87** | 0.71 |
+| English rewrite + raw at half weight | **0.90** | 0.86 |
+| same, on noisy `asr_text` | 0.85 | — |
+
+Remaining failures:
+- **Conversations:**
+  - fact left unstated: PC019/PC020 refuse-at-door "7–10 days", PC010 RRN
+  - over-cautious abstention: PC011/PC012 "what if I'm not home"
+  - Hindi synonyms the strict scorer misses: PC009, PC016
+- **Single questions:** PQ0053 invented an answer; PQ0058 asked "which colour?" unnecessarily.
 
 ## Key decisions (and why)
 - **Agent LLM = Gemini `gemini-3.1-flash-lite`, free tier, via the OpenAI-compatible endpoint.**
@@ -69,9 +77,11 @@ Retrieval Recall@5, using the cached rewrites:
 - Repo stays private until just before submission. Commits only as the user's noreply identity.
 
 ## Next steps
-- [ ] Refill missing 3.1 rows (`full`, `conversations`, `baseline`). Completed rows replay from cache.
-- [ ] Fill `report/report.md` TBDs from `eval/results/gemini-3.1-flash-lite/` and check every number with a script; add the 3.5 vs 3.1 comparison.
-- [ ] Voice: when a `hi-IN` transcript exists, prefer a Devanagari `hi` reply (PC021 currently answers in Hinglish); retest by voice.
+- [x] Refill missing 3.1 rows: all complete.
+- [x] Report: every number taken from the CSVs; 3.5 vs 3.1 comparison included.
+- [x] Voice: a Hindi caller stays in Hindi when reading out digits (`State.lang`). Verified live on PC021 turn 2.
+- [ ] After the quota reset (12:30 IST): rerun PC021 by voice to confirm turns 3–4 in Hindi.
+- [ ] Optional quality fix: a post-check that every "must state" computed fact (refund timing, RRN) appears in the reply.
 - [ ] `sample_outputs/` from a clean `run.py` run (no `.env`, no dataset copy).
 - [ ] report.pdf (≤4 pp).
 - [ ] Record the demo.mp4 (≤2 min, user): one question answered from the docs plus a follow-up, and one handover or "I don't know". Use `python app.py`.
