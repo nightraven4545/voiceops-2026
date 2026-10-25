@@ -1,12 +1,17 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 15:05 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 15:35 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (64/64 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
+- **Brief audit, 25 Oct 15:30** (all 14 pages re-read): every build requirement is met. Open items are only the demo video, making the repo public, and the final zip.
+  - Fixed in this audit: the README got the repo URL and a Credits section; the report now explains the compensation choice. The brief's example also raises a ticket; the practice gold (PC015/16) refuses with none, and we follow the gold.
+  - Interface rule (p.12): "anything that plays and records audio: a web page or a notebook". The Gradio page qualifies; UI design earns no marks.
+  - Watch-out: "voice experience" judges "clear, short replies". Median reply is 30–37 words, but 12/148 exceed 50 (max 84). Pick short-answer questions for the demo.
+  - Course FAQ: "Do not submit generated code you cannot explain", and the top 50 demo live. Rehearse explaining one turn: STT → understand → verify/tools → retrieve → compose → guards → TTS.
 - The clean-clone check **passed** at 12:48 IST on 25 Oct: 13/13 files with **live** LLM calls (24 fresh responses, 0 errors), and PC002 made exactly the gold tool calls including `create_ticket()`.
   - 12/13 decisions matched the committed `sample_outputs`. **PQ0002** (spoken SKU garbled to "s q le 12") answered `clarify` ("which product or order ID?") instead of the committed `answer` ("I don't have that information" + human). Same transcript; the difference is Gemini sampling, because `src/` sets no `temperature`. Both replies are acceptable. Cached results are stable, but fresh runs (and the organizers' run) can differ turn by turn.
 - Live latency on the free tier: median 20.9 s per voice turn (9–49 s).
@@ -15,7 +20,7 @@
 **Next actions, in order (deadline 26 Oct 2026):**
 1. ~~Clean-clone LLM check + delete `vofresh`~~: done (see above).
 2. ~~PC021 by voice, add to `sample_outputs/`~~: done 13:16 IST (see Checklist history).
-3. **Demo video, recorded by the user:** ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar) or Clipchamp. Suggested script:
+3. **Demo video, recorded by the user:** ≤2 min, `python app.py` in Chrome, record with Win+Alt+R (Xbox Game Bar, mic on via Win+G) or Clipchamp. The brief (p.11) asks for "a demo of a **spoken** conversation": speak each question; type only if STT misses digits. Do a warm-up question and "New call" before recording (the first turn takes ~30 s). Suggested script:
    1. English: "How long does a refund to UPI take?" → follow-up "And if I paid by card?"
    2. Hinglish order flow: give order ID 8978 2837, then last 4 digits 4533, then "TV damaged, replacement approve kar do" → ticket + handover
    3. "Is there a student discount?" → "I don't have that information"

@@ -80,3 +80,11 @@ Results are written to `eval/results/` as CSV + markdown tables. LLM responses a
 | `src/voice.py` | Gnani STT/TTS, audio conversion |
 | `eval/` | Practice-set scorer and test-audio generator |
 | `tests/` | Rule tests against the practice gold |
+
+## Credits
+
+- Speech: Gnani.ai `gnani-vachana` SDK and REST API (Prisma STT, Timbre v2.5 TTS).
+- Language model: Google Gemini `gemini-3.1-flash-lite` through its OpenAI-compatible API (`openai` client).
+- Retrieval: `intfloat/multilingual-e5-small` via `sentence-transformers`, and `bm25s`.
+- Demo UI: Gradio. Audio conversion: `imageio-ffmpeg`, `soundfile`.
+- Data: the synthetic ZentroMart dataset (`Capstone_Project_Dataset_FTTT_2026`) and capstone brief from the IIT Guwahati Consulting & Analytics Club × Gnani.ai VoiceOps 2026 course. No real customer data is used.

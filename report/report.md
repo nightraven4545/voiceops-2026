@@ -25,7 +25,7 @@
   - The ₹49 pickup fee, refund timing after refusing at the door, and the refund reference number.
 - **Policy-owned decisions.**
   - The ESC-1 triggers force an escalation: human requested, fraud, legal, safety, ≥2 earlier contacts, item > ₹10,000, or an overdue refund. The model cannot escalate on its own.
-  - A compensation demand is refused unless it is the one case DEL-4 pays for (a late Express order).
+  - A compensation demand is refused unless it is the one case DEL-4 pays for (a late Express order). The brief's example also raises a ticket here; the practice gold refuses without one, and we follow the gold. A caller who then asks for a person still gets a ticket and a handover.
 - **Guards.**
   - A ticket is only mentioned after `create_ticket` returns `created=True`.
   - Replies claiming a cancellation, approval or credit, or showing private digits, are regenerated.
