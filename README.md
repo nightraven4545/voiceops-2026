@@ -2,6 +2,8 @@
 
 A customer-support agent for the fictional store ZentroMart that answers from company documents, holds a verified multi-turn conversation, and takes phone-style audio in and out through **Gnani** speech (the only STT/TTS used).
 
+Repository: https://github.com/nightraven4545/voiceops-2026
+
 ```
 audio ─► Gnani STT (en-IN, + hi-IN for Hindi speech) ─► agent ─► Gnani TTS ─► reply.wav
                                                          │
@@ -19,6 +21,8 @@ The LLM only understands and phrases. Dates, return windows, refund timelines, v
 Python 3.11 or 3.12. **On Windows, clone into a short path** (e.g. `C:\voiceops`): torch's installed file paths are long, and without [long-path support](https://pip.pypa.io/warnings/enable-long-paths) `pip install` fails inside deep folders.
 
 ```bash
+git clone https://github.com/nightraven4545/voiceops-2026.git voiceops   # Windows: clone into e.g. C:\voiceops
+cd voiceops
 python -m venv .venv
 .venv/Scripts/activate            # Windows; on macOS/Linux: source .venv/bin/activate
 python -m pip install -r requirements.txt   # `python -m pip` also works where Windows blocks the pip.exe launcher
