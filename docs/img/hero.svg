@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">ZentroMart Voice Support Agent, VoiceOps 2026</title>
+  <desc id="desc">Multilingual voice AI customer-support agent. Gnani speech in and out, answers only from policy documents, verifies callers before order help. 96% of practice questions and 98% of conversation turns fully correct, 100% exact tool calls, English, Hindi and Hinglish.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE1C7"/>
+      <stop offset="0.5" stop-color="#FBF7F2"/>
+      <stop offset="1" stop-color="#D3F1F8"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="1200" height="380" rx="24"/></clipPath>
+  </defs>
+  <rect width="1200" height="380" rx="24" fill="url(#bg)"/>
+  <g clip-path="url(#card)">
+    <circle cx="1105" cy="345" r="185" fill="#CDBBF3" opacity="0.35"/>
+    <circle cx="1010" cy="40" r="95" fill="#9FE3F0" opacity="0.35"/>
+  </g>
+  <g font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+    <text x="64" y="76" font-size="15" letter-spacing="3" fill="#9A5B1E" font-weight="600">VOICEOPS 2026 · CAPSTONE PROJECT</text>
+    <text x="64" y="136" font-size="46" font-weight="700" fill="#1F2933">ZentroMart Voice Support Agent</text>
+    <text x="64" y="178" font-size="20" fill="#3E4C59">Multilingual voice AI that answers only from policy documents, verifies</text>
+    <text x="64" y="205" font-size="20" fill="#3E4C59">callers before discussing an order, and speaks with Gnani.ai speech.</text>
+    <g>
+      <rect x="64" y="240" width="240" height="72" rx="14" fill="#FFFFFF" fill-opacity="0.88" stroke="#EAD9C8"/>
+      <text x="86" y="274" font-size="30" font-weight="700" fill="#D9480F">96%</text>
+      <text x="86" y="298" font-size="14" fill="#52606D">practice questions correct</text>
+      <rect x="326" y="240" width="240" height="72" rx="14" fill="#FFFFFF" fill-opacity="0.88" stroke="#EAD9C8"/>
+      <text x="348" y="274" font-size="30" font-weight="700" fill="#0B7A6F">98%</text>
+      <text x="348" y="298" font-size="14" fill="#52606D">conversation turns correct</text>
+      <rect x="588" y="240" width="240" height="72" rx="14" fill="#FFFFFF" fill-opacity="0.88" stroke="#EAD9C8"/>
+      <text x="610" y="274" font-size="30" font-weight="700" fill="#5F45C2">100%</text>
+      <text x="610" y="298" font-size="14" fill="#52606D">exact tool calls</text>
+      <rect x="850" y="240" width="240" height="72" rx="14" fill="#FFFFFF" fill-opacity="0.88" stroke="#EAD9C8"/>
+      <text x="872" y="274" font-size="22" font-weight="700" fill="#1F2933">EN · HI · Hinglish</text>
+      <text x="872" y="298" font-size="14" fill="#52606D">speech in and out</text>
+    </g>
+    <text x="64" y="350" font-size="15" fill="#52606D">IIT Guwahati Consulting &amp; Analytics Club × Gnani.ai · VoiceOps 2026 · Team Dstonks</text>
+  </g>
+</svg>

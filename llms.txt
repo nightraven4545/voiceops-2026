@@ -1,0 +1,19 @@
+# VoiceOps 2026: ZentroMart Voice Support Agent
+
+> Multilingual (English, Hindi, Hinglish) voice AI customer-support agent for ZentroMart, a fictional Indian online store. Gnani.ai speech-to-text and text-to-speech; a Gemini LLM only understands the caller and phrases the reply, while Python code owns identity verification, tool calls (lookup_order, create_ticket), policy date maths, the pincode table and escalation. Answers come only from retrieved policy sections (hybrid BM25 + multilingual-e5 RAG over 84 sections) and cite section IDs. Built by Team Dstonks for the VoiceOps 2026 capstone (IIT Guwahati Consulting & Analytics Club × Gnani.ai); unofficial student project.
+
+Key results on the dataset's practice set (gemini-3.1-flash-lite): 96% of 52 questions and 98% of 96 conversation turns fully correct; 100% exact tool calls; prompt-only baseline 15%; retrieval Recall@5 0.90.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/README.md): what it does, setup, run command, results, FAQ
+- [Report (Markdown source)](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/report/report.md): what was built in each step, evaluation, failures and fixes; [PDF version](https://github.com/nightraven4545/voiceops-2026/blob/main/report/report.pdf)
+- [Sample outputs](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/sample_outputs/README.md): 17 audio inputs with spoken replies, transcripts and cited sources
+
+## Code
+
+- [run.py](https://github.com/nightraven4545/voiceops-2026/blob/main/run.py): batch command, `python run.py --input <audio folder> --output <folder>`
+- [src/agent.py](https://github.com/nightraven4545/voiceops-2026/blob/main/src/agent.py): conversation state, verification, tools, LLM calls, guards
+- [src/kb.py](https://github.com/nightraven4545/voiceops-2026/blob/main/src/kb.py): policy section parser and hybrid retrieval
+- [src/rules.py](https://github.com/nightraven4545/voiceops-2026/blob/main/src/rules.py): business days, return windows, refund timelines, escalation flags, speech-text normaliser
+- [src/voice.py](https://github.com/nightraven4545/voiceops-2026/blob/main/src/voice.py): Gnani STT/TTS and audio conversion
