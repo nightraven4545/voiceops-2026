@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 19:50 IST** · latest commit on `origin/main` (private GitHub repo).
+> Last updated: **25 Oct 2026, 20:35 IST** · latest commit on `origin/main` (private GitHub repo).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -12,6 +12,8 @@
   - Interface rule (p.12): "anything that plays and records audio: a web page or a notebook". The Gradio page qualifies; UI design earns no marks.
   - Watch-out: "voice experience" judges "clear, short replies". Median reply is 30–37 words, but 12/148 exceed 50 (max 84). Pick short-answer questions for the demo.
   - Course FAQ: "Do not submit generated code you cannot explain", and the top 50 demo live. Rehearse explaining one turn: STT → understand → verify/tools → retrieve → compose → guards → TTS.
+- **Demo recording model, 25 Oct ~20:30:** Google returned `503 "This model is currently experiencing high demand"` on every `gemini-3.1-flash-lite` call (not our quota: ~62/500 used; quota errors are 429). So the **demo app was restarted on `gemini-3.5-flash-lite` for the recording only**, via `$env:LLM_MODEL` in the "demo app 3.5" terminal tab; no code or `.env` change. The submission model, every eval number and the zip's default stay `gemini-3.1-flash-lite`. A first test turn on 3.5 answered correctly (UPI refund 1–3 business days, REF-2). To go back, close that tab and start `python app.py` normally.
+  - The demo app has no graceful fallback: during an outage it hangs ~60 s in client retries, then shows a Gradio error. `run.py` does catch errors and speaks "Sorry, I'm having trouble right now".
 - **Brief PDF forensics, 25 Oct 17:15:** no traps found.
   - No JavaScript, auto-run actions, forms, encryption, hidden layers, invisible-text mode, tiny text or off-page text.
   - The 10 annotations are links to Gnani's site/docs and the dataset download.
