@@ -26,7 +26,7 @@ cp .env.example .env              # then fill in the keys
 
 `.env` needs:
 - `GNANI_API_KEY` — from app.gnani.ai/voice → API Keys.
-- `LLM_API_KEY` — a Gemini key (aistudio.google.com/apikey); the default model is `gemini-3.5-flash-lite`. Any OpenAI-compatible endpoint works via `LLM_BASE_URL` / `LLM_MODEL`, or set `LLM_PROVIDER=anthropic` with `ANTHROPIC_API_KEY`.
+- `LLM_API_KEY` — a Gemini key (aistudio.google.com/apikey); the default model is `gemini-3.1-flash-lite`. Any OpenAI-compatible endpoint works via `LLM_BASE_URL` / `LLM_MODEL`, or set `LLM_PROVIDER=anthropic` with `ANTHROPIC_API_KEY`.
 - `DATASET_DIR` — path to the extracted `Capstone_Project_Dataset_FTTT_2026` folder (default: inside this repo). The dataset is not committed.
 
 The first run downloads the `intfloat/multilingual-e5-small` embedding model (~470 MB) from Hugging Face.

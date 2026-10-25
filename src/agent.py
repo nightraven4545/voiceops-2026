@@ -25,7 +25,7 @@ sys.path.insert(0, str(rules.DATASET))
 from tools import create_ticket, lookup_order  # noqa: E402
 
 PROVIDER = os.getenv("LLM_PROVIDER", "openai")  # "openai" = any OpenAI-compatible endpoint (Gemini, Groq)
-MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
+MODEL = os.getenv("LLM_MODEL", "gemini-3.1-flash-lite")
 MIN_GAP = float(os.getenv("LLM_MIN_SECONDS", "0"))  # spacing between calls for free-tier RPM limits
 CACHE = ROOT / ".cache" / "llm"
 with open(rules.DATASET / "data" / "products.csv", encoding="utf-8") as f:

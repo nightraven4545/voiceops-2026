@@ -8,6 +8,7 @@ Add --split dev|test to score only one fixed part (tune on dev, report test).
 import argparse
 import csv
 import hashlib
+import os
 import re
 import sys
 import unicodedata
@@ -20,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from src import kb  # noqa: E402
 from src.rules import DATASET, _MONTHS_EN, _MONTHS_HI, normalize_asr  # noqa: E402
 
-RESULTS = ROOT / "eval" / "results"
+RESULTS = ROOT / "eval" / "results" / os.getenv("LLM_MODEL", "gemini-3.1-flash-lite")  # one folder per model
 # Evidence the agent's code adds itself (greeting, verification, date maths, escalation),
 # so retrieval is judged only on the content sections.
 PROCESS_IDS = {"STY-1", "IDV-2", "IDV-3", "KB-00.1", "KB-00.3", "ESC-1"}
@@ -118,7 +119,7 @@ def save(rows, name, table):
         w.writeheader()
         w.writerows(rows)
     (RESULTS / f"{name}.md").write_text(table + "\n", encoding="utf-8")
-    print(table, f"\n\nsaved eval/results/{name}.csv and .md")
+    print(table, f"\n\nsaved {RESULTS.relative_to(ROOT)}/{name}.csv and .md")
 
 
 def run_guarded(fn, rows, label):

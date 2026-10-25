@@ -1,5 +1,7 @@
 # VoiceOps 2026 capstone — working notes
 
+**Start every session by reading `PROJECT_STATE.md`** (status, results, decisions, next steps, gotchas). Update it and commit after every milestone and before ending a session. Research with sources is in `docs/research/`.
+
 Invariants (never break):
 - Gnani is the only STT/TTS, even as a fallback (anything else disqualifies).
 - No hardcoded answers; test answers come from the agent, never edited by hand.
