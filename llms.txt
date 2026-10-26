@@ -7,7 +7,7 @@ Key results on the dataset's practice set (gemini-3.1-flash-lite): 96% of 52 que
 ## Docs
 
 - [README](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/README.md): what it does, setup, run command, results, FAQ
-- [Report (Markdown source)](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/report/report.md): what was built in each step, evaluation, failures and fixes; [PDF version](https://github.com/nightraven4545/voiceops-2026/blob/main/report/report.pdf)
+- [Report (Markdown source)](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/report/report.md): what was built in each step, evaluation, failures and fixes; [designed PDF, submitted version](https://github.com/nightraven4545/voiceops-2026/blob/main/report1.pdf)
 - [Sample outputs](https://raw.githubusercontent.com/nightraven4545/voiceops-2026/main/sample_outputs/README.md): 17 audio inputs with spoken replies, transcripts and cited sources
 
 ## Code

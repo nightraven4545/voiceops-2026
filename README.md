@@ -13,7 +13,7 @@
 ![Tests: 80 passing](https://img.shields.io/badge/tests-80%20passing-2F9E44)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB)
 
-[Quick start](#quick-start) · [How one call works](#how-one-call-works) · [Results](#results) · [Real example](#a-real-call-from-sample_outputs) · [Demo video](demo.mp4) · [Report](report/report.pdf) · [FAQ](#faq)
+[Quick start](#quick-start) · [How one call works](#how-one-call-works) · [Results](#results) · [Real example](#a-real-call-from-sample_outputs) · [Demo video](demo.mp4) · [Report](report1.pdf) · [FAQ](#faq)
 
 Repository: [github.com/nightraven4545/voiceops-2026](https://github.com/nightraven4545/voiceops-2026)
 
@@ -89,7 +89,7 @@ flowchart LR
 - **Held-out test split:** we tuned on a fixed development split; the held-out test split scores 16/17 questions and 20/21 conversation turns.
 - **Voice end to end:** every file in `sample_outputs/` is processed, including silence, and one bad file never stops a batch.
 
-Full method, failure analysis and what we would fix next are in the **[4-page report](report/report.pdf)**.
+Full method, failure analysis and what we would fix next are in the **[4-page report](report1.pdf)**.
 
 ## A real call from `sample_outputs`
 
@@ -177,7 +177,8 @@ The submission zip contains only the files the brief asks for. `app.py`, `eval/`
 | `eval/` | Practice-set scorer, test-audio generator and results per model |
 | `tests/` | Rule and conversation tests (scripted LLM, no API calls) |
 | `sample_outputs/` | 17 audio inputs with spoken replies, transcripts and cited sources |
-| `report/report.pdf` | The 4-page project report |
+| `report1.pdf` | The 4-page project report (submitted version) |
+| `report/` | Report source (`report.md`) and a plain generated PDF |
 | `demo.mp4` | Recorded spoken demo |
 
 ## FAQ
@@ -218,7 +219,7 @@ On the dataset's practice set:
 - 100% correct decisions and exact tool calls in conversations
 - a prompt-only baseline scores 15%
 
-See [Results](#results) and the [report](report/report.pdf).
+See [Results](#results) and the [report](report1.pdf).
 
 ### Is any real customer data used?
 
