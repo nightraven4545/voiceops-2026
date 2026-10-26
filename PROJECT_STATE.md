@@ -1,7 +1,7 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **25 Oct 2026, 21:10 IST** · latest commit on `origin/main` (**public** GitHub repo since 25 Oct 21:08).
+> Last updated: **26 Oct 2026, 00:20 IST** · latest commit on `origin/main` (**public** GitHub repo since 25 Oct 21:08).
 
 ## ▶ Handoff — start here
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
@@ -54,10 +54,24 @@
 6. **Submission:**
    - ~~make the repo public~~: **done 25 Oct 21:08** with the user's go-ahead. Verified while signed out: the repo, README (repository URL + clone command) and demo.mp4 return HTTP 200. Before going public, the whole history (23 commits) was checked: `.env` was never committed and neither key appears anywhere.
    - build `Dstonks_voiceops.zip` (team name: **Dstonks**). The layout is the brief's p.14 "Submission ZIP structure": `README.md`, `.env.example`, `requirements.txt`, `run.py`, `src/`, `report.pdf`, `demo.mp4`, `sample_outputs/`; no `.env`, keys, venv or dataset copy. From the repo root, after committing everything (git archive takes only committed files; `--add-file` puts a file at the zip root):
-     `git archive --format=zip -9 --add-file=report/report.pdf --add-file=demo.mp4 -o Dstonks_voiceops.zip HEAD README.md .env.example requirements.txt run.py src sample_outputs`
+     **Current command (26 Oct):** the submitted report is the user's designed `report1.pdf` (PowerPoint, 4 pages, with logos). Copy it to `<tmp>/report.pdf`, then:
+     `git archive --format=zip -9 --add-file=<tmp>/report.pdf -o outputs/submission/Dstonks_voiceops.zip HEAD README.md .env.example requirements.txt run.py src demo.mp4 sample_outputs docs/img report1.pdf`
+     (`docs/img` and `report1.pdf` are included so the README's images and report links work inside the zip.)
    - **Trial run 25 Oct 14:55** (without demo.mp4): 80 files, 10.4 MB. A scan with the real key values found neither key, no key patterns and no forbidden paths. Extracted to a fresh folder, the documented command answered PQ0003 end to end (live LLM, Gnani in and out, valid WAV) in 31 s.
    - The README now has the repository URL and a clone command (the brief requires the public GitHub URL).
-   - **Final zip BUILT 25 Oct 21:02:** `outputs/submission/Dstonks_voiceops.zip` (git-ignored), 30.4 MB, 81 files, from commit `c5e4efa`.
+   - **Final zip REBUILT 26 Oct ~00:15 from `a8f6534`:** `outputs/submission/Dstonks_voiceops.zip`, 30.6 MB, 84 files.
+     - The root `report.pdf` is byte-identical to `report1.pdf`.
+     - All 34 WAVs have valid headers.
+     - Every README link and image resolves inside the zip.
+     - Neither real key is present, and there are no forbidden paths.
+     - demo.mp4 is identical to the user's video.
+     - **Rebuild it if anything in the zip changes after `a8f6534`.**
+   - **26 Oct, after midnight:**
+     - README redesigned for search and answer engines (hero and results SVGs, Mermaid diagram, verbatim sample call, FAQ headings, text-only credits; no logos, by the user's choice) plus `llms.txt`.
+     - The 16 sample input WAVs got real headers (same audio).
+     - The repo description and 20 topics are set.
+     - The user's GitHub upload (`a5a45ef`, report1.pdf) was merged (`86d245e`); a rebase had failed on an OneDrive file lock.
+   - Previous build, 25 Oct 21:02, from `c5e4efa` (superseded):
      - All 8 items in the brief's layout (demo.mp4 included).
      - Secret scan with the real key values: neither key found. No forbidden paths.
      - A fresh extract plus `run.py` on PQ0003 answered correctly (REF-2), with a valid 6.2 s WAV and no errors (run on 3.5 because 3.1 was overloaded).
