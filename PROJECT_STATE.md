@@ -8,11 +8,11 @@
 
 **Rules for v1.1:** never touch `main` before results; never edit `UNDERSTAND_SYSTEM`/`COMPOSE_SYSTEM`/schemas (a one-character change misses the whole LLM cache, ~1,400 live calls); every fix is a code post-check that only adds calls on the turns it flags. Tag `v1.0` = `a8f6534` (the zip's source) — push the tag only with the user's OK.
 
-**Done on the branch (28 Oct, cloud session, tests NOT yet run — the dataset isn't in the cloud container):**
+**Done on the branch (28 Oct, cloud session, tests NOT yet run — the dataset isn't in the cloud container). Commits are local: the push got 403 (no GitHub access from that session); `outputs/v1.1.patch` was sent to the user — `git am` it on the PC if the branch isn't on GitHub:**
 - `docs/demo_transcript.md`: the 9 demo turns read off the video frames (the demo saved no log). Real unscripted Hinglish voice. Found: turn 3 says "connect kar deta hoon" with decision `answer` and no ticket (ESC-2 trap); turns 1 and 4 got English replies to Hinglish; turn 8 asks for a phone number (no tool can use one).
 - **A. Live-demo safety:** `app.py` speaks `TROUBLE` instead of a Gradio error, warms up retrieval before launch, logs each turn (masked) to `outputs/demo_log/`, shows stt/agent/tts seconds. `LLM_MAX_RETRIES` (app sets 1) and optional `LLM_FALLBACK_MODEL` in `llm_json` (cache key unchanged for the main model). `run.py` records `timings`; NOT_HEARD/TROUBLE follow the caller's language.
 - **Privacy:** `tool_calls` stays gold-exact (the practice gold scores `verification_value=4533` verbatim); verification values are masked on screen/in the demo log and stripped (with 6/10-digit numbers) from ticket summaries.
-- **B. Grounding guards (full mode only):** B1 a reply saying "we don't offer X" (`NEGATIVE`) must be backed by a verbatim quote from the evidence/facts/catalog (`_grounded_no`, one optional call, quote checked as a substring), else it abstains via the existing second look — targets PQ0053, PQ0004-ASR; B2 sentences claiming a handover/ticket (`HANDOVER_CLAIM`, offers excluded) are dropped unless decision is `escalate` or a ticket exists — targets PC002-t3 and demo turn 3; B4 romanized Hindi labelled `en` (≥3 Hindi function words) replies in Hinglish.
+- **B. Grounding guards (full mode only):** B1 a reply saying "we don't offer X" (`NEGATIVE`) must be backed by a verbatim quote from the evidence/facts/catalog (`_grounded_no`, one optional call, quote checked as a substring), else it abstains via the existing second look — targets PQ0053, PQ0004-ASR; B2 sentences claiming a handover/ticket (`HANDOVER_CLAIM`, offers excluded) are dropped unless decision is `escalate` or a ticket exists — targets PC002-t3 and demo turn 3; B4 romanized Hindi labelled `en` replies in Hinglish (same 15% Hindi-marker rule the STT uses, now shared as `rules.sounds_hindi`).
 - **C.** `evaluate.py --questions PATH` (any question CSV with the practice columns) and `--mode voice --run OUT --questions recordings/expected.csv`; `docs/voice_test.md` = what to record + expected CSV. `recordings/` is git-ignored.
 
 **Next, in order:**
@@ -21,7 +21,7 @@
 3. B3 (PQ0058 colour clarify): check in `products.csv` why ELE-0013/0014 don't group; add a "same return window for every colour" note in `catalog_lines`.
 4. `eval/extra/unseen.csv` (~40 rows: unsupported services, near-negative controls, support-log traps; user spot-reviews) → v1.0 vs v1.1 on dev, report test.
 5. Record `docs/voice_test.md` clips → `run.py` → `--mode voice`.
-6. `docs/judge_prep.md` (one turn end to end + likely judge questions) and a README link; update this file.
+6. `docs/judge_prep.md` is written (one turn end to end with line refs, likely questions, demo checklist); add its v1.1 numbers after step 2, and a README link when merging after results.
 - **User:** rotate the Gnani and Gemini keys (still open); watch Discord for the top-50 demo date.
 
 ## Pre-submission handoff (26 Oct, history)

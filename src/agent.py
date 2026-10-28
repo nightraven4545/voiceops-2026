@@ -78,8 +78,6 @@ HANDOVER_CLAIM = re.compile(r"\b(i am|i'm|i will|i'll|i have|i've|we have|we've|
                             r"|(जोड़|कनेक्ट|ट्रांसफ़र|ट्रांसफर)\s+(कर\s+)?(रहा|रही|दिया|दी|देता|देती)"
                             r"|टिकट\s+(\S+\s+){0,2}(बना|रेज़|रेज|दर्ज)\s+(कर\s+)?(दिया|दी)", re.I)
 OFFER = re.compile(r"\bif you\b|\bwould you\b|chah(e|ei|te)n?\b|चाहें|चाहते", re.I)
-HINDI_WORDS = re.compile(r"\b(hai|hain|toh|mera|mere|meri|mujhe|kya|nahi|nahin|aap|aapka|kar|karo|chahiye|chaahiye|kab|"
-                         r"kaise|kahan|kyun|haan|bhaiya|yaar|bataiye|dijiye|kijiye|hoga|ka|ki|ke)\b", re.I)
 
 UNDERSTAND_SYSTEM = """You read the latest customer message sent to ZentroMart (an Indian online store) support and extract what the support system needs. Today is Tuesday 2026-10-20. The message may be a speech-recognition transcript with no punctuation and misheard words; when two transcripts of the same audio are given, combine them.
 - english_query: a short standalone English search query for the company policy documents, built from the latest message plus the conversation so far (resolve "that", "it", "aur refund?"). Name the policy topic, e.g. "refund time for credit card after initiation" or "return window for clothing bought in festive sale". No order IDs or digits the customer gave for verification.
@@ -314,7 +312,7 @@ class Agent:
             u = {**u, "reply_lang": "hi"}
         elif alt_text and st.lang == "hi" and u["reply_lang"] == "hi-en":
             u = {**u, "reply_lang": "hi"}  # a Hindi caller reading out digits is not switching to Hinglish
-        elif u["reply_lang"] == "en" and len({w.lower() for w in HINDI_WORDS.findall(norm)}) >= 3:
+        elif u["reply_lang"] == "en" and rules.sounds_hindi(norm):
             u = {**u, "reply_lang": "hi-en"}  # romanized Hindi heard as English: answer in Hinglish (STY-4)
         st.lang = u["reply_lang"]
         queries = [u["english_query"], norm]
