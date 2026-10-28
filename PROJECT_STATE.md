@@ -1,9 +1,30 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **26 Oct 2026, 00:20 IST** · latest commit on `origin/main` (**public** GitHub repo since 25 Oct 21:08).
+> Last updated: **28 Oct 2026** · v1.1 work on branch `claude/inspiring-hopper-uebbso`; `main` = the submitted v1.0, **frozen until results**.
 
-## ▶ Handoff — start here
+## ▶ Handoff — start here (post-submission, v1.1)
+**Submitted 26 Oct** (Dstonks zip + public repo URL). The organisers score the hidden test on that zip, so v1.1 cannot change the auto-scored marks; it serves a possible **top-50 live demo** and the portfolio.
+
+**Rules for v1.1:** never touch `main` before results; never edit `UNDERSTAND_SYSTEM`/`COMPOSE_SYSTEM`/schemas (a one-character change misses the whole LLM cache, ~1,400 live calls); every fix is a code post-check that only adds calls on the turns it flags. Tag `v1.0` = `a8f6534` (the zip's source) — push the tag only with the user's OK.
+
+**Done on the branch (28 Oct, cloud session, tests NOT yet run — the dataset isn't in the cloud container):**
+- `docs/demo_transcript.md`: the 9 demo turns read off the video frames (the demo saved no log). Real unscripted Hinglish voice. Found: turn 3 says "connect kar deta hoon" with decision `answer` and no ticket (ESC-2 trap); turns 1 and 4 got English replies to Hinglish; turn 8 asks for a phone number (no tool can use one).
+- **A. Live-demo safety:** `app.py` speaks `TROUBLE` instead of a Gradio error, warms up retrieval before launch, logs each turn (masked) to `outputs/demo_log/`, shows stt/agent/tts seconds. `LLM_MAX_RETRIES` (app sets 1) and optional `LLM_FALLBACK_MODEL` in `llm_json` (cache key unchanged for the main model). `run.py` records `timings`; NOT_HEARD/TROUBLE follow the caller's language.
+- **Privacy:** `tool_calls` stays gold-exact (the practice gold scores `verification_value=4533` verbatim); verification values are masked on screen/in the demo log and stripped (with 6/10-digit numbers) from ticket summaries.
+- **B. Grounding guards (full mode only):** B1 a reply saying "we don't offer X" (`NEGATIVE`) must be backed by a verbatim quote from the evidence/facts/catalog (`_grounded_no`, one optional call, quote checked as a substring), else it abstains via the existing second look — targets PQ0053, PQ0004-ASR; B2 sentences claiming a handover/ticket (`HANDOVER_CLAIM`, offers excluded) are dropped unless decision is `escalate` or a ticket exists — targets PC002-t3 and demo turn 3; B4 romanized Hindi labelled `en` (≥3 Hindi function words) replies in Hinglish.
+- **C.** `evaluate.py --questions PATH` (any question CSV with the practice columns) and `--mode voice --run OUT --questions recordings/expected.csv`; `docs/voice_test.md` = what to record + expected CSV. `recordings/` is git-ignored.
+
+**Next, in order:**
+1. **Dataset into the cloud session** (user attaches the zip) → `pytest` here with stubbed retrieval; fix what fails.
+2. On the PC: `git pull`; `pytest tests`; cache-only replay (`LLM_BASE_URL=http://127.0.0.1:9/v1`) of `--mode full`, `full --asr`, `conversations` → the misses are the changed turns; live-run only those. **No regression vs v1.0:** full 96%, ASR 96%, conversations 94/96, tools 100%. Watch PC002-t3: B2 drops its second sentence — check the gold's must_include still passes.
+3. B3 (PQ0058 colour clarify): check in `products.csv` why ELE-0013/0014 don't group; add a "same return window for every colour" note in `catalog_lines`.
+4. `eval/extra/unseen.csv` (~40 rows: unsupported services, near-negative controls, support-log traps; user spot-reviews) → v1.0 vs v1.1 on dev, report test.
+5. Record `docs/voice_test.md` clips → `run.py` → `--mode voice`.
+6. `docs/judge_prep.md` (one turn end to end + likely judge questions) and a README link; update this file.
+- **User:** rotate the Gnani and Gemini keys (still open); watch Discord for the top-50 demo date.
+
+## Pre-submission handoff (26 Oct, history)
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).
