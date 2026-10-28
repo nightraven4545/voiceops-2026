@@ -337,3 +337,21 @@ def test_all_claim_reply_gets_one_rewrite(monkeypatch, rewrite, said):  # demo t
     monkeypatch.setattr(agent, "llm_json", llm_json)
     r = agent.Agent().respond("Mera refund kara do fatafat")
     assert said in r["reply"] and r["tool_calls"] == []
+
+
+@pytest.mark.parametrize("skus, noted", [
+    (["ELE-0013", "ELE-0014"], True),    # practice PQ0058: K7 256 GB colours differ only in Assured
+    (["ELE-0022", "ELE-0023"], False),   # one line already says "same for every colour listed"
+    (["ELE-0013"], False)])
+def test_colour_variants_with_one_return_window(skus, noted):
+    lines = agent.catalog_lines([agent.PRODUCTS[s] for s in skus])
+    assert all(("return window same for every colour" in x) is noted for x in lines)
+
+
+def test_redact_keeps_no_verification_value():  # run.py --redact; README: no verification secrets in logs
+    import run
+    rec = {"transcript": "last four digits 4,533 hai", "transcript_hi": "लास्ट फोर डिजिट्स 4 533 हैं",
+           "tool_calls": ["lookup_order(order_id=89782837, verification_value=4533)"]}
+    run.redact(rec)
+    assert rec["tool_calls"] == ["lookup_order(order_id=89782837, verification_value=••••)"]
+    assert "533" not in rec["transcript"] + rec["transcript_hi"] and "89782837" in rec["tool_calls"][0]

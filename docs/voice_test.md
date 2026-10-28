@@ -1,6 +1,7 @@
 # Your own voice test
 
 The judges will speak live, so test with real speech, not Gnani-generated audio.
+**Record only your own voice.** The brief (p.12) forbids recording anyone else without written consent.
 
 **Recording:**
 - Use your phone or laptop mic, in any audio format `run.py` reads (wav, m4a, mp3, ogg…).

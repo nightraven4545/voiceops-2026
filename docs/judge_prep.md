@@ -43,6 +43,9 @@
 - **Privacy?**
   - Order data is shown only after verification, with private fields stripped.
   - Verification values never go into ticket summaries, and are masked on the demo screen.
+  - The dataset README says not to repeat verification secrets in logs, but the practice gold scores
+    `lookup_order(…, verification_value=4533)` verbatim. So batch outputs keep the gold form by default, and
+    `run.py --redact` masks the value in saved files and transcripts.
 - **What fails?**
   - Hindi synonyms the strict scorer misses (PC009, PC016).
   - A spoken SKU is unrecoverable ("ELE zero zero one two" was heard as "s q le 12").

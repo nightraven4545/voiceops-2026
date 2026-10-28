@@ -197,7 +197,12 @@ def catalog_lines(products):
         key = (p["title"].split(",")[0], p["return_category"], p["fulfilled_by"], p["assured"],
                p["warranty_months"], int(p["price_inr"]) > rules.HIGH_VALUE)
         groups.setdefault(key, []).append(p)
-    return [_catalog_line(g) for g in groups.values()]
+    lines = {}  # product -> return categories of its lines; one category over several lines: colour doesn't matter
+    for title, category, *_ in groups:
+        lines.setdefault(title, []).append(category)
+    return [_catalog_line(g) + (" | return window same for every colour of this product"
+                                if len(lines[k[0]]) > 1 and len(set(lines[k[0]])) == 1 else "")
+            for k, g in groups.items()]
 
 
 def _catalog_line(group):

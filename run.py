@@ -4,6 +4,7 @@
 
 Audio files directly in AUDIO_DIR are separate calls. Each sub-folder is one conversation:
 its files are played to the same agent in natural order (turn1, turn2, ... turn10).
+--redact masks verification values in the saved files (off by default: the practice gold scores the exact tool call).
 """
 import argparse
 import csv
@@ -25,6 +26,19 @@ TROUBLE = {"en": "Sorry, I'm having trouble right now. Please try again in a mom
            "hi-en": "Maaf kijiye, abhi thodi dikkat aa rahi hai. Kripya thodi der baad phir koshish karein."}
 
 
+def mask(text):
+    return re.sub(r"(verification_value=)\d+", r"\1••••", text)
+
+
+def redact(rec):
+    """The saved record keeps no verification value: not in the tool calls, not as the caller said it ("4,533")."""
+    for v in re.findall(r"verification_value=(\d+)", " ".join(rec.get("tool_calls", []))):
+        said = re.compile(r"(?<!\d)" + r"[ ,.]?".join(v) + r"(?!\d)")
+        for k in ("transcript", "transcript_hi"):
+            rec[k] = rec.get(k) and said.sub("••••", rec[k])
+    rec["tool_calls"] = [mask(c) for c in rec.get("tool_calls", [])]
+
+
 def natural(p):
     return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", p.name)]
 
@@ -33,7 +47,7 @@ def audio_in(folder):
     return sorted((p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in AUDIO), key=natural)
 
 
-def handle(path, agent, out_dir, conversation):
+def handle(path, agent, out_dir, conversation, hide=False):
     t0, rec, lang = time.time(), {"file": str(path), "conversation": conversation}, agent.state.lang or "en"
     timings = rec["timings"] = {}
     try:
@@ -59,6 +73,8 @@ def handle(path, agent, out_dir, conversation):
         rec["error"] = (rec.get("error", "") + f" | TTS {type(e).__name__}: {e}").strip(" |")
     timings["tts"] = round(time.time() - t1, 2)
     rec["seconds"] = round(time.time() - t0, 2)
+    if hide:
+        redact(rec)
     stem.with_suffix(".txt").write_text(rec["reply"] + "\n", encoding="utf-8")
     stem.with_suffix(".json").write_text(json.dumps(rec, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print(f"{path.name}: [{rec['decision']}] {rec['reply'][:100]}" + (f"  !! {rec['error']}" if "error" in rec else ""))
@@ -70,12 +86,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--input", required=True, type=Path)
     ap.add_argument("--output", required=True, type=Path)
+    ap.add_argument("--redact", action="store_true", help="mask verification values in the saved files")
     args = ap.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    records = [handle(f, Agent(), args.output, "") for f in audio_in(args.input)]
+    records = [handle(f, Agent(), args.output, "", args.redact) for f in audio_in(args.input)]
     for folder in sorted((d for d in args.input.iterdir() if d.is_dir()), key=natural):
         agent = Agent()  # one conversation = one agent and its state
-        records += [handle(f, agent, args.output / folder.name, folder.name) for f in audio_in(folder)]
+        records += [handle(f, agent, args.output / folder.name, folder.name, args.redact) for f in audio_in(folder)]
     with open(args.output / "results.csv", "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow(["file", "conversation", "transcript", "reply", "decision", "sources", "tool_calls", "seconds", "error"])

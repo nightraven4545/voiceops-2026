@@ -5,7 +5,6 @@
 """
 import json
 import os
-import re
 import tempfile
 import time
 from datetime import date
@@ -14,18 +13,13 @@ os.environ.setdefault("LLM_MAX_RETRIES", "1")  # live: fail over in seconds inst
 
 import gradio as gr  # noqa: E402
 
-from run import NOT_HEARD, TROUBLE  # noqa: E402
+from run import NOT_HEARD, TROUBLE, mask  # noqa: E402
 from src import kb  # noqa: E402
 from src.agent import Agent  # noqa: E402
 from src.rules import ROOT  # noqa: E402
 from src.voice import speak, transcribe  # noqa: E402
 
 LOG = ROOT / "outputs" / "demo_log"
-
-
-def mask(text):
-    """Verification values never reach the screen or the demo log (the agent's own records keep the gold form)."""
-    return re.sub(r"(verification_value=)\d+", r"\1••••", text)
 
 
 def turn(audio, typed, agent, chat):
