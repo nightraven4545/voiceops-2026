@@ -207,3 +207,151 @@ def test_never_claims_ticket_that_failed(scripted, monkeypatch):
     for m in ["Order number hai 8978 2837.", "Last four digits 4533 hain.", "TV damage report kiya tha"]:
         r = a.respond(m)
     assert r["decision"] == "escalate" and "create_ticket()" not in r["tool_calls"] and "Sorry" in r["reply"]
+
+
+def negative_llm(reply, quote, evidence_text=None):
+    """Compose says "we don't offer X" (covered); the verifier returns `quote` (or raises if it is an exception)."""
+    calls = []
+
+    def llm_json(system, user, schema, **_):
+        if schema is agent.UNDERSTAND_SCHEMA:
+            return {"english_query": "store pickup", "reply_lang": "en", "intent": "delivery", "products": [],
+                    "payment_method": "none", "refund_initiated_on": "", "delivered_on": "", "ordered_on": "", "flags": []}
+        if schema is agent.VERIFY_SCHEMA:
+            calls.append(user)
+            if isinstance(quote, Exception):
+                raise quote
+            return {"quote": quote}
+        return {"covered": True, "decision": "answer", "evidence": ["DEL-1"], "ticket_summary": "", "reply": reply}
+    return llm_json, calls
+
+
+@pytest.mark.parametrize("reply, quote, kept", [
+    ("ZentroMart does not support store pickups.", "", False),                                   # practice PQ0053
+    ("We do not offer midnight delivery scheduling.", "We do not offer midnight delivery.", False),  # invented quote
+    ("Store pickup is not available.", "Store pickup is not available at any location.", True),     # quote is real
+    ("Store pickup is not available.", RuntimeError("429"), True),       # verifier failed: the reply stands
+    ("Standard delivery takes 3 to 6 business days.", "", True)])        # no negative claim: no extra call
+def test_negative_claims_need_a_quote(monkeypatch, reply, quote, kept):
+    chunk = {**kb.BY_ID["DEL-1"], "text": "Store pickup is not available at any location.", "score": 0.0}
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: [chunk])
+    llm, calls = negative_llm(reply, quote)
+    monkeypatch.setattr(agent, "llm_json", llm)
+    r = agent.Agent().respond("Can I pick up my order from a store?")
+    assert r["reply"].endswith(reply) is kept and r["reply"].endswith(agent.NOT_COVERED["en"]) is not kept
+    assert len(calls) == (0 if "Standard" in reply else 1)
+    assert "MATERIAL" in (calls or ["MATERIAL"])[0] and "pick up my order" not in (calls or [""])[0]  # not the caller
+
+
+def test_second_look_reply_needs_a_quote_too(monkeypatch):
+    ranked = [{**kb.BY_ID[i], "score": 0.0} for i in ("TRK-2", "DEL-1", "DEL-3")]
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: ranked[:1] if k == 6 else ranked)
+    llm, calls = negative_llm("We do not offer store pickup.", "")
+
+    def two_looks(system, user, schema, **kw):
+        out = llm(system, user, schema, **kw)
+        if schema is not agent.VERIFY_SCHEMA and schema is not agent.UNDERSTAND_SCHEMA:
+            return {**out, "covered": "[DEL-3]" in user, "evidence": ["DEL-3"]}
+        return out
+    monkeypatch.setattr(agent, "llm_json", two_looks)
+    r = agent.Agent().respond("Can I pick up my order from a store?")
+    assert r["reply"].endswith(agent.NOT_COVERED["en"]) and len(calls) == 1  # the wide reply was checked and refused
+
+
+def test_negative_check_is_full_mode_only(monkeypatch):  # the Step 2 baseline keeps its v1.0 behaviour
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: [{**kb.BY_ID["DEL-1"], "score": 0.0}])
+    llm, calls = negative_llm("ZentroMart does not support store pickups.", "")
+    monkeypatch.setattr(agent, "llm_json", llm)
+    assert agent.Agent("rag").respond("Store pickup?")["reply"].endswith("store pickups.") and not calls
+
+
+@pytest.mark.parametrize("reply, said", [
+    ("Theek hai. Main aapko ek human colleague se connect kar deta hoon.", "Theek hai."),  # demo turn 3
+    ("Shukriya. Isliye main ek colleague ko connect kar raha hoon jo madad karenge.", "Shukriya."),  # PC002-t3
+    ("I'm connecting you to a colleague now.", agent.NOT_COVERED["hi-en"]),
+    ("Aap chahein toh main aapko colleague se connect kar sakti hoon.", None),             # an offer stays
+    ("I'll connect you to a colleague if you'd like.", None)])
+def test_never_claims_a_handover_that_did_not_happen(scripted, reply, said):
+    r = scripted(reply=reply).respond("Mujhe refund chahiye")
+    assert r["decision"] == "answer" and r["tool_calls"] == [] and r["reply"].endswith(said or reply)
+
+
+def test_a_real_ticket_may_be_mentioned_later(scripted, monkeypatch):
+    monkeypatch.setattr(agent, "create_ticket", lambda *a, **k: {"created": True, "ticket_id": "T1"})
+    a = scripted(reply="Maine ticket raise kar diya hai.")
+    for m in ["Order number hai 8978 2837.", "Last four digits 4533 hain.", "TV damage report kiya tha"]:
+        a.respond(m)
+    assert a.state.ticket_id and a.respond("Aur kuch?")["reply"].endswith("Maine ticket raise kar diya hai.")
+
+
+def test_ticket_summary_carries_no_verification_values(scripted, monkeypatch):
+    sent = {}
+    monkeypatch.setattr(agent, "create_ticket", lambda summary, **k: sent.update(summary=summary) or
+                        {"created": True, "ticket_id": "T1"})
+    a = scripted(ticket_summary="Order 89782837: caller verified with 4533, pincode 400001, phone 9876543210; TV damaged.")
+    for m in ["Order number hai 8978 2837.", "Last four digits 4533 hain.", "TV damage report kiya tha"]:
+        a.respond(m)
+    assert "89782837" in sent["summary"] and not re.search(r"4533|400001|9876543210", sent["summary"])
+
+
+@pytest.mark.parametrize("said, lang", [
+    ("yaar bhaiya saman toh mera damage hai toh replacement kab tak ho jaayega", "hi-en"),  # demo turn 1
+    ("How long does a refund to UPI take?", "en")])
+def test_romanized_hindi_gets_a_hinglish_reply(monkeypatch, said, lang):
+    llm = fake_llm({})
+    monkeypatch.setattr(agent, "llm_json", lambda s, u, schema, **_: (
+        {**llm(s, u, schema), "reply_lang": "en"} if schema is agent.UNDERSTAND_SCHEMA else llm(s, u, schema)))
+    assert agent.Agent().respond(said)["lang"] == lang
+
+
+def test_fallback_model_on_failure(monkeypatch, tmp_path):
+    monkeypatch.setattr(agent, "CACHE", tmp_path)
+    monkeypatch.setattr(agent, "FALLBACK", "backup-model")
+    used = []
+
+    def call(model, *a):
+        used.append(model)
+        if model != "backup-model":
+            raise RuntimeError("503 overloaded")
+        return {"quote": "ok"}
+    monkeypatch.setattr(agent, "_call", call)
+    assert agent.llm_json("s", "u", agent.VERIFY_SCHEMA) == {"quote": "ok"} and used == [agent.MODEL, "backup-model"]
+    assert agent.llm_json("s", "u", agent.VERIFY_SCHEMA, model="backup-model") == {"quote": "ok"} and len(used) == 2  # cached
+    with pytest.raises(RuntimeError):  # optional extras fail fast, no fallback
+        agent.llm_json("s", "u2", agent.VERIFY_SCHEMA, optional=True)
+
+
+@pytest.mark.parametrize("rewrite, said", [
+    ("Main refund approve nahi kar sakta. Aap chahein toh colleague se connect kar sakta hoon.", "chahein toh colleague"),
+    ("Main aapko colleague se connect kar raha hoon.", agent.NOT_COVERED["hi-en"]),  # still claims: abstain
+    (RuntimeError("429"), agent.NOT_COVERED["hi-en"])])
+def test_all_claim_reply_gets_one_rewrite(monkeypatch, rewrite, said):  # demo turn 3: refusal and claim in one sentence
+    llm = fake_llm({"reply": "Main refund approve nahi kar sakta, iske liye main aapko colleague se connect kar deta hoon."})
+
+    def llm_json(system, user, schema, **kw):
+        if "BUT NONE DID" in user:
+            if isinstance(rewrite, Exception):
+                raise rewrite
+            return {**llm(system, user, schema), "reply": rewrite}
+        return llm(system, user, schema)
+    monkeypatch.setattr(agent, "llm_json", llm_json)
+    r = agent.Agent().respond("Mera refund kara do fatafat")
+    assert said in r["reply"] and r["tool_calls"] == []
+
+
+@pytest.mark.parametrize("skus, noted", [
+    (["ELE-0013", "ELE-0014"], True),    # practice PQ0058: K7 256 GB colours differ only in Assured
+    (["ELE-0022", "ELE-0023"], False),   # one line already says "same for every colour listed"
+    (["ELE-0013"], False)])
+def test_colour_variants_with_one_return_window(skus, noted):
+    lines = agent.catalog_lines([agent.PRODUCTS[s] for s in skus])
+    assert all(("return window same for every colour" in x) is noted for x in lines)
+
+
+def test_redact_keeps_no_verification_value():  # run.py --redact; README: no verification secrets in logs
+    import run
+    rec = {"transcript": "last four digits 4,533 hai", "transcript_hi": "लास्ट फोर डिजिट्स 4 533 हैं",
+           "tool_calls": ["lookup_order(order_id=89782837, verification_value=4533)"]}
+    run.redact(rec)
+    assert rec["tool_calls"] == ["lookup_order(order_id=89782837, verification_value=••••)"]
+    assert "533" not in rec["transcript"] + rec["transcript_hi"] and "89782837" in rec["tool_calls"][0]

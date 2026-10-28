@@ -3,6 +3,8 @@
   python eval/evaluate.py --mode retrieval [--asr]          # section-ID Recall@k / MRR, no LLM
   python eval/evaluate.py --mode baseline|rag|full [--asr]  # single questions (Step 1 / Step 2 / full agent)
   python eval/evaluate.py --mode conversations              # multi-turn practice conversations
+  python eval/evaluate.py --mode full --questions eval/extra/unseen.csv   # another question set, same columns
+  python eval/evaluate.py --mode voice --run OUT --questions recordings/expected.csv  # score run.py on your own audio
 Add --split dev|test to score only one fixed part (tune on dev, report test).
 """
 import argparse
@@ -11,6 +13,8 @@ import hashlib
 import os
 import re
 import sys
+import json
+import statistics
 import unicodedata
 from collections import defaultdict
 from datetime import date
@@ -19,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import kb  # noqa: E402
-from src.rules import DATASET, _MONTHS_EN, _MONTHS_HI, normalize_asr  # noqa: E402
+from src.rules import DATASET, _MONTHS_EN, _MONTHS_HI, normalize_asr, numbers  # noqa: E402
 
 RESULTS = ROOT / "eval" / "results" / os.getenv("LLM_MODEL", "gemini-3.1-flash-lite")  # one folder per model
 # Evidence the agent's code adds itself (greeting, verification, date maths, escalation),
@@ -34,7 +38,7 @@ DATE_RES = [re.compile(r"\b(2026)-(\d\d)-(\d\d)\b"),
 
 
 def practice(name):
-    with open(DATASET / "practice" / name, encoding="utf-8") as f:
+    with open(name if Path(name).is_file() else DATASET / "practice" / name, encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
@@ -138,7 +142,7 @@ def run_guarded(fn, rows, label):
     return out
 
 
-def eval_questions(mode, asr, which):
+def eval_questions(mode, asr, which, path=None):
     from src.agent import Agent
 
     def one(q):
@@ -151,10 +155,37 @@ def eval_questions(mode, asr, which):
                 "expected": q["expected_decision"], "reply": r["reply"], "sources": " ; ".join(r["sources"]),
                 "gold": q["gold_evidence"]}
 
-    rows = run_guarded(one, [q for q in practice("questions.csv") if in_split(q["id"], which)], "question")
-    name = f"questions_{mode}{'_asr' if asr else ''}_{which}"
+    rows = run_guarded(one, [q for q in practice(path or "questions.csv") if in_split(q["id"], which)], "question")
+    name = f"{Path(path).stem if path else 'questions'}_{mode}{'_asr' if asr else ''}_{which}"
     if rows:
         save(rows, name, summarize(rows, "language", f"{name} ({len(rows)} questions)"))
+
+
+def eval_voice(run_dir, path, which):
+    """run.py's replies to your own recordings. Expected rows use the question columns, with id = the audio file's stem
+    (conversation folder/stem for a turn) and an optional `digits` column: what the caller said (order ID, proof)."""
+    recs = {}
+    for j in Path(run_dir).rglob("*.json"):
+        r = json.loads(j.read_text(encoding="utf-8"))
+        recs[f"{r['conversation']}/{j.stem}" if r.get("conversation") else j.stem] = r
+    rows = []
+    for q in practice(path):
+        if q["id"] not in recs or not in_split(q["id"], which):
+            continue
+        r = recs[q["id"]]
+        heard = " ".join(numbers(normalize_asr(f"{r.get('transcript', '')} {r.get('transcript_hi') or ''}")))
+        s = score(r["reply"], r["decision"], split(q["acceptable_decisions"]) or [q["expected_decision"]],
+                  q["must_include"], q["must_not_include"], q["gold_evidence"], r.get("sources", []))
+        rows.append({"id": q["id"], "language": q["language"], **s, "digits_ok": all(
+                     d in heard.replace(" ", "") for d in split(q.get("digits", ""))), "transcript": r.get("transcript", ""),
+                     "reply": r["reply"], **{k: r.get("timings", {}).get(k, "") for k in ("stt", "agent", "tts")}})
+    if not rows:
+        return print("no recordings matched the expected ids")
+    med = {k: statistics.median(x[k] for x in rows if x[k] != "") for k in ("stt", "agent", "tts") if any(x[k] != "" for x in rows)}
+    table = summarize(rows, "language", f"voice_{Path(path).stem}_{which} ({len(rows)} clips)") + \
+        f"\n\nDigits heard right: {100 * sum(r['digits_ok'] for r in rows) / len(rows):.0f}% · median seconds: " + \
+        " · ".join(f"{k} {v:.1f}" for k, v in med.items())
+    save(rows, f"voice_{Path(path).stem}_{which}", table)
 
 
 def eval_conversations(which):
@@ -237,7 +268,9 @@ def eval_retrieval(asr, rewrite):
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["retrieval", "baseline", "rag", "full", "conversations"], required=True)
+    ap.add_argument("--mode", choices=["retrieval", "baseline", "rag", "full", "conversations", "voice"], required=True)
+    ap.add_argument("--questions", help="a question CSV with the practice columns (default: practice/questions.csv)")
+    ap.add_argument("--run", help="voice: the run.py output folder")
     ap.add_argument("--asr", action="store_true", help="use asr_text instead of the clean question")
     ap.add_argument("--split", choices=["all", "dev", "test"], default="all")
     ap.add_argument("--rewrite", action="store_true", help="retrieval: use the agent's cached English rewrite")
@@ -246,5 +279,7 @@ if __name__ == "__main__":
         eval_retrieval(args.asr, args.rewrite)
     elif args.mode == "conversations":
         eval_conversations(args.split)
+    elif args.mode == "voice":
+        eval_voice(args.run, args.questions, args.split)
     else:
-        eval_questions(args.mode, args.asr, args.split)
+        eval_questions(args.mode, args.asr, args.split, args.questions)

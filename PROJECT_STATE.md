@@ -1,9 +1,31 @@
 # Project state — VoiceOps 2026 capstone
 
 > **Handoff file.** Read this first in any new chat. Update it (and commit) after every milestone and before ending a session.
-> Last updated: **26 Oct 2026, 00:20 IST** · latest commit on `origin/main` (**public** GitHub repo since 25 Oct 21:08).
+> Last updated: **28 Oct 2026** · v1.1 work on branch `claude/inspiring-hopper-uebbso`; `main` = the submitted v1.0, **frozen until results**.
 
-## ▶ Handoff — start here
+## ▶ Handoff — start here (post-submission, v1.1)
+**Submitted 26 Oct** (Dstonks zip + public repo URL). The organisers score the hidden test on that zip, so v1.1 cannot change the auto-scored marks; it serves a possible **top-50 live demo** and the portfolio.
+
+**Rules for v1.1:** never touch `main` before results; never edit `UNDERSTAND_SYSTEM`/`COMPOSE_SYSTEM`/schemas (a one-character change misses the whole LLM cache, ~1,400 live calls); every fix is a code post-check that only adds calls on the turns it flags. Tag `v1.0` = `a8f6534` (the zip's source) — push the tag only with the user's OK.
+
+**Done on the branch (28 Oct, cloud session; pushed to `origin/claude/inspiring-hopper-uebbso`; 109 tests pass there with dense retrieval stubbed to BM25 — HF is blocked in the cloud — and every new guard is mutation-checked):**
+- `docs/demo_transcript.md`: the 9 demo turns read off the video frames (the demo saved no log). Real unscripted Hinglish voice. Found: turn 3 says "connect kar deta hoon" with decision `answer` and no ticket (ESC-2 trap); turns 1 and 4 got English replies to Hinglish; turn 8 asks for a phone number (no tool can use one).
+- **A. Live-demo safety:** `app.py` speaks `TROUBLE` instead of a Gradio error, warms up retrieval before launch, logs each turn (masked) to `outputs/demo_log/`, shows stt/agent/tts seconds. `LLM_MAX_RETRIES` (app sets 1) and optional `LLM_FALLBACK_MODEL` in `llm_json` (cache key unchanged for the main model). `run.py` records `timings`; NOT_HEARD/TROUBLE follow the caller's language.
+- **Privacy:** `tool_calls` stays gold-exact (the practice gold scores `verification_value=4533` verbatim); verification values are masked on screen/in the demo log and stripped (with 6/10-digit numbers) from ticket summaries.
+- **B. Grounding guards (full mode only):** B1 a reply saying "we don't offer X" (`NEGATIVE`) must be backed by a verbatim quote from the evidence/facts/catalog (`_grounded_no`, one optional call, quote checked as a substring), else it abstains via the existing second look — targets PQ0053, PQ0004-ASR; B2 sentences claiming a handover/ticket (`HANDOVER_CLAIM`, offers excluded) are dropped unless decision is `escalate` or a ticket exists — targets PC002-t3 and demo turn 3; B4 romanized Hindi labelled `en` replies in Hinglish (same 15% Hindi-marker rule the STT uses, now shared as `rules.sounds_hindi`).
+- **C.** `evaluate.py --questions PATH` (any question CSV with the practice columns) and `--mode voice --run OUT --questions recordings/expected.csv`; `docs/voice_test.md` = what to record + expected CSV. `recordings/` is git-ignored.
+
+- **28 Oct, later (dataset attached):** B3 `catalog_lines` adds "return window same for every colour" when one product's lines share a return category (PQ0058: K7 256 GB Grey/Beige differ only in Assured). `run.py --redact` masks verification values in saved files (README l.64 says no secrets in logs; off by default because the practice gold scores `verification_value=4533` verbatim). `eval/extra/unseen.csv`: 40 never-tuned questions written from the KB — 20 services no document mentions (must abstain; inventing a "no" fails), 10 controls where the KB really says no (abstaining fails), 10 traps modelled on support-log mistakes (log IDs in `notes`); split 24 dev / 16 test; an always-abstain agent scores exactly 50%. **User: spot-review it.**
+
+**Next, in order (all on the PC, which has the LLM cache and keys):**
+1. `git pull`; `python -m pytest tests` (full, real e5).
+2. Cache-only replay (`LLM_BASE_URL=http://127.0.0.1:9/v1`) of `--mode full`, `--mode full --asr`, `--mode conversations`: the misses are the turns v1.1 changed (expect PQ0053, PQ0004-ASR, PQ0058, PC002-t3 and any turn a guard flags). Live-run only those. **No regression vs v1.0:** full 96%, ASR 96%, conversations 94/96, tools 100%. Watch PC002-t3 (B2 drops its second sentence) against the gold's must_include.
+3. `python eval/evaluate.py --mode full --questions eval/extra/unseen.csv --split dev` on v1.0 (`git worktree add ../v10 a8f6534`) and on v1.1; tune on dev only, then report `--split test` once.
+4. Record the `docs/voice_test.md` clips (own voice only) → `python run.py --input recordings --output outputs/voice_real` → `python eval/evaluate.py --mode voice --run outputs/voice_real --questions recordings/expected.csv`.
+5. Put the v1.1 numbers in `docs/judge_prep.md`; after results, merge to `main` and add a README link.
+- **User:** rotate the Gnani and Gemini keys (still open); watch Discord for the top-50 demo date.
+
+## Pre-submission handoff (26 Oct, history)
 **Where things stand.** The agent is built, evaluated (full agent 96%, conversations 98%, tool calls 100% exact), documented, and pushed. The report PDF (4 pages: at the limit, add nothing) and `sample_outputs/` (17 files, PC021 included) are done. A clean clone installs and runs (80/80 tests). Both optional quality fixes are done; **stop changing the agent** and finish the submission. What's left is mostly finishing and submitting.
 
 **In flight:** nothing. Only one chat should work from this file at a time (on 25 Oct two chats both picked up the same next action).

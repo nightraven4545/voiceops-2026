@@ -190,6 +190,16 @@ _MONTHS_EN = "January February March April May June July August September Octobe
 _MONTHS_HI = "जनवरी फ़रवरी मार्च अप्रैल मई जून जुलाई अगस्त सितंबर अक्टूबर नवंबर दिसंबर".split()
 
 
+# Romanized Hindi function words: if a Latin-script transcript is full of these, the caller is speaking Hindi
+HINDI_MARKERS = set("""hai hain kya mera meri mere mujhe aap aapka aapki nahi nahin kab kaise kitne kitna chahiye
+karna kar raha rahi tha thi hoon hun ka ki ke ko se mein par bhi aur abhi wala wali""".split())
+
+
+def sounds_hindi(text):
+    words = re.findall(r"[a-z]+", text.lower())
+    return bool(words) and sum(w in HINDI_MARKERS for w in words) / len(words) >= 0.15
+
+
 def for_ear(text, lang="en"):
     """Reply text -> what TTS should read (STY-3): full dates with year, 8-digit IDs in 4+4."""
     months = _MONTHS_HI if lang == "hi" else _MONTHS_EN

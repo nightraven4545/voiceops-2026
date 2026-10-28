@@ -12,14 +12,11 @@ import soundfile as sf
 from gnani.stt import GnaniSTTClient
 from gnani.tts import AudioConfig, GnaniTTSClient
 
-from src.rules import for_ear
+from src.rules import for_ear, sounds_hindi
 
 CHUNK_SECONDS = 30  # REST STT accepts <= 60 s; Gnani recommends <= 30 s
 TTS_MODEL = "timbre-v2.5"
 VOICES = {"en": ("Kaveri", "en-IN"), "hi": ("Bhavna", "hi-IN"), "hi-en": ("Poorvi", "hi-en")}
-# Romanized Hindi function words: if en-IN output is full of these, the caller is speaking Hindi
-HINDI_MARKERS = set("""hai hain kya mera meri mere mujhe aap aapka aapki nahi nahin kab kaise kitne kitna chahiye
-karna kar raha rahi tha thi hoon hun ka ki ke ko se mein par bhi aur abhi wala wali""".split())
 # en-IN writes spoken Hindi numbers as words ("saat hazaar saat sau chialis"); any of these means the
 # digits must come from a hi-IN pass, even when the sentence has few other Hindi words
 HINDI_NUMBERS = set("""shunya ek teen chaar char paanch panch chhe chheh saat aath nau das gyarah barah bees tees
@@ -78,8 +75,7 @@ def transcribe(path):
             return "", None
         en = _stt_text(pieces, "en-IN")
         words = re.findall(r"[a-z]+", en.lower())
-        hindi = words and (sum(w in HINDI_MARKERS for w in words) / len(words) >= 0.15
-                           or any(w in HINDI_NUMBERS for w in words))
+        hindi = sounds_hindi(en) or any(w in HINDI_NUMBERS for w in words)
         return en, (_stt_text(pieces, "hi-IN") or None) if hindi else None
 
 
