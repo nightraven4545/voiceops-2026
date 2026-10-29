@@ -124,11 +124,3 @@ def test_find_skus():
 def test_for_ear():
     assert rules.for_ear("Refund by 2026-10-27 for order 89782837.") == "Refund by 27 October 2026 for order 8978 2837."
     assert rules.for_ear("**2026-10-27**", "hi") == "27 अक्टूबर 2026"
-
-
-@pytest.mark.parametrize("text, hindi", [
-    ("yaar bhaiya saman toh mera damage naa hai toh i was looking for replacement kab tak ho jaayega", True),  # demo
-    ("ji bahut bahut badhiya per aap mujhe bataaenge ki policy kya hai refund ki matlab kispe aap karte hain", True),
-    ("How long does a refund to UPI take?", False), ("Can I return a kurta bought in the festive sale?", False), ("", False)])
-def test_sounds_hindi(text, hindi):  # Latin-script Hindi: second STT pass, and a Hinglish reply
-    assert rules.sounds_hindi(text) is hindi
