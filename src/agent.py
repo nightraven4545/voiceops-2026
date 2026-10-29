@@ -403,7 +403,7 @@ class Agent:
             if fix and all(rules.states(fix["reply"], f) for f in [*missing, out["reply"]]) \
                     and not FORBIDDEN.search(fix["reply"]):
                 out = {**out, "reply": fix["reply"], "evidence": out["evidence"] + fix["evidence"]}
-        if not abstain and decision != "escalate" and not st.ticket_id:  # no handover happened: never say one did
+        if self.mode == "full" and not abstain and decision != "escalate" and not st.ticket_id:  # no handover happened: never say one did
             kept = self._unclaimed(out["reply"])
             if not kept:  # the whole reply was the claim: one optional rewrite, else abstain
                 try:

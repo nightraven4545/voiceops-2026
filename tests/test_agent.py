@@ -276,6 +276,12 @@ def test_never_claims_a_handover_that_did_not_happen(scripted, reply, said):
     assert r["decision"] == "answer" and r["tool_calls"] == [] and r["reply"].endswith(said or reply)
 
 
+def test_handover_check_is_full_mode_only(monkeypatch):  # the Step 2 baseline keeps its v1.0 behaviour
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: [{**kb.BY_ID["DEL-1"], "score": 0.0}])
+    monkeypatch.setattr(agent, "llm_json", fake_llm({"reply": "I'm connecting you to a colleague now."}))
+    assert agent.Agent("rag").respond("Refund?")["reply"].endswith("I'm connecting you to a colleague now.")
+
+
 def test_a_real_ticket_may_be_mentioned_later(scripted, monkeypatch):
     monkeypatch.setattr(agent, "create_ticket", lambda *a, **k: {"created": True, "ticket_id": "T1"})
     a = scripted(reply="Maine ticket raise kar diya hai.")

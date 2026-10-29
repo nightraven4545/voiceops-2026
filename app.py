@@ -13,7 +13,7 @@ os.environ.setdefault("LLM_MAX_RETRIES", "1")  # live: fail over in seconds inst
 
 import gradio as gr  # noqa: E402
 
-from run import NOT_HEARD, TROUBLE, mask  # noqa: E402
+from run import NOT_HEARD, TROUBLE, mask, redact  # noqa: E402
 from src import kb  # noqa: E402
 from src.agent import Agent  # noqa: E402
 from src.rules import ROOT  # noqa: E402
@@ -52,10 +52,12 @@ def turn(audio, typed, agent, chat):
                f"**Order:** {st.order_id or '-'} · verified: {'yes' if st.order else 'no'} · "
                f"ticket: {st.ticket_id or '-'}  \n"
                f"**Seconds:** " + " · ".join(f"{k} {v}" for k, v in t.items()) + (f"  \n**Error:** {error}" if error else ""))
+    rec = {"transcript": heard, "tool_calls": r["tool_calls"]}
+    redact(rec)  # the log keeps no verification value, not even as the caller said it
     LOG.mkdir(parents=True, exist_ok=True)
     with open(LOG / f"{date.today()}.jsonl", "a", encoding="utf-8") as f:
-        f.write(json.dumps({"heard": heard, "reply": r["reply"], "decision": r["decision"], "sources": r["sources"],
-                            "tool_calls": tools, "seconds": t, "error": error}, ensure_ascii=False) + "\n")
+        f.write(json.dumps({"heard": rec["transcript"], "reply": r["reply"], "decision": r["decision"], "sources": r["sources"],
+                            "tool_calls": rec["tool_calls"], "seconds": t, "error": error}, ensure_ascii=False) + "\n")
     return chat, wav, details, agent, chat, None, ""
 
 
