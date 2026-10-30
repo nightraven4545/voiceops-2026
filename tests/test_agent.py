@@ -221,7 +221,7 @@ def negative_llm(reply, quote, evidence_text=None):
             calls.append(user)
             if isinstance(quote, Exception):
                 raise quote
-            return {"quote": quote}
+            return {"thing": "store pickup", "quote": quote}
         return {"covered": True, "decision": "answer", "evidence": ["DEL-1"], "ticket_summary": "", "reply": reply}
     return llm_json, calls
 
@@ -241,6 +241,24 @@ def test_negative_claims_need_a_quote(monkeypatch, reply, quote, kept):
     assert r["reply"].endswith(reply) is kept and r["reply"].endswith(agent.NOT_COVERED["en"]) is not kept
     assert len(calls) == (0 if "Standard" in reply else 1)
     assert "MATERIAL" in (calls or ["MATERIAL"])[0] and "pick up my order" not in (calls or [""])[0]  # not the caller
+
+
+@pytest.mark.parametrize("second, kept", [
+    ("We do not offer store pickup.", False),  # a real "only within India" must not vouch for a made-up "no"
+    ("We do not deliver to Dubai.", True)])     # each claim backed by its own line
+def test_each_negative_claim_needs_its_own_quote(monkeypatch, second, kept):
+    line = "ZentroMart delivers only within India."
+    monkeypatch.setattr(kb, "retrieve", lambda queries, k=6, weights=None: [{**kb.BY_ID["DEL-5"], "text": line, "score": 0.0}])
+    reply = f"ZentroMart only delivers within India. {second}"
+    llm, calls = negative_llm(reply, None)
+
+    def per_claim(system, user, schema, **kw):  # like the real model on PQ0053: names the thing, quotes the India line anyway
+        out = llm(system, user, schema, **kw)
+        return {"thing": "store pickup" if "pickup" in user.split("CLAIM:")[-1] else "delivery to Dubai", "quote": line} \
+            if schema is agent.VERIFY_SCHEMA else out
+    monkeypatch.setattr(agent, "llm_json", per_claim)
+    r = agent.Agent().respond("Can you deliver to Dubai?")
+    assert r["reply"].endswith(reply) is kept and len(calls) == 2
 
 
 def test_second_look_reply_needs_a_quote_too(monkeypatch):
